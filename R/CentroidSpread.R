@@ -6,6 +6,7 @@
 #'@description Function to produce centroid and spread of settled individuals
 #'
 #'@return map showing centroid and spread of settled individuals
+#'@export
 
 require(RCurl)
 require(diagram)
