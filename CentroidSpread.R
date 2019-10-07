@@ -11,6 +11,7 @@
 require(RCurl)
 require(diagram)
 require(car)
+require(raster)
 
 source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
 source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
