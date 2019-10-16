@@ -11,6 +11,7 @@ require(mapdata)
 require(maptools)
 require(pryr)
 require(repmis)
+require(rangeBuilder)
 
 #setwd("https://github.com/torrem/SnowCrabFunctions.git")
 
@@ -38,12 +39,15 @@ m2 <- map2SpatialPolygons(m, IDs=m$names, proj4string=CRS("+proj=longlat +datum=
 
 #png(filename = "AKMapStartCentSettle.png", res = 600, height = 6, width = 6, units = "in")
 
-
+#colorRampPalette(c("black", "blue" ,"purple","yellow")
+#colorRampPalette(c("red","purple","blue","cadetblue1","white"))
 #dev.new()
 BERMap %<a-%{
-if(addDepth==TRUE){mypal <- colorRampPalette(c("black", "blue" ,"purple","yellow"), bias=0.05)
-plot(ak, col=mypal(1000), yaxs="i", legend.args = list(text = 'Depth (m)', cex=0.8))}
-if(addDepth==FALSE){plot(ak, col='White', yaxs="i",legend=FALSE)}  
+if(addDepth==TRUE){mypal <- colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgoldenrod1","tan1"), bias=0.015)
+plot(ak, col=mypal(10000), yaxs="i", legend=FALSE)
+mypal1 = colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgoldenrod1","tan1"))
+addRasterLegend(ak, ramp=mypal1(10000), longFrac=0.8, ncolors = 10000)}
+if(addDepth==FALSE){plot(ak, col='White', yaxs="i",legend=FALSE)}
 plot(m2, add=TRUE, col='grey')
 #dev.off()
 
@@ -60,29 +64,29 @@ plot(m2, add=TRUE, col='grey')
 
 ###- add grid----
 
-  
+
 
 ## Transform coordinates tow work with other components of map ##
 
   for (i in 1:length(ConGrid1)){
-    
+
     if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
       x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
       x = ifelse(x > 0,x, 360-abs(x) )
       ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
     }
-    
+
     if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
       x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
       x = ifelse(x > 0,x, 360-abs(x) )
       ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
-      
+
       x = ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1]
       x = ifelse(x > 0,x, 360-abs(x) )
       ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1] = x
     }
   }
-  
+
   if(addGrid==TRUE){plot(ConGrid1,add=TRUE)}
 
 }

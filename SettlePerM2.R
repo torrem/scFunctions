@@ -1,17 +1,19 @@
-# Centroid and spread of settled individuals 
+# Map number of successful individuals per meter in each connectivity region
 #
 #'
-#'@title Take disMELS output file dfrs (from readAllResults) and produce a map that calculates centroid and spread of settled individuals
+#'@title Take disMELS output file dfrs (from readAllResults) and produce a map that 
+#'shows number of successful individuals per meter in each connectivity region
 #'
-#'@description Function to produce centroid and spread of settled individuals
+#'@description Function to produce map of number of successful individuals per meter in each connectivity region
 #'
-#'@return map showing centroid and spread of settled individuals
-#'@export
+#'@return map of number of successful individuals per meter in each connectivity region
+
+
+resdr = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Test Run 5"
+
 
 require(RCurl)
 require(diagram)
-require(car)
-require(raster)
 
 source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
 source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
@@ -20,19 +22,14 @@ source("https://github.com/torrem/SnowCrabFunctions/raw/master/BeringMap.R");
 info<-getLifeStageInfo.SnowCrab();
 typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
-SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, addStarters=FALSE, 
-                      addSettlers=TRUE){
+SettlePerM2 <-function(resdr, Map=FALSE, addSettlers=TRUE){
   
   load(paste(resdr,"/dfrs.RData",sep="")) 
   
-  #create basemap
-  #dev.new(width=6, height=6, unit="in")
-  #windows(width = 12, height = 12);getBeringMap()
-  
-  
+
   ## convert coordinates to work with map ##
   for (i in 1:length(typeNames)){
-   # print(paste("Convertving Coordinates for", typeNames[i]))
+    #print(paste("Convertving Coordinates for", typeNames[i]))
     dfrs[[i]][,"horizPos1"]  = ifelse(dfrs[[i]][,"horizPos1"] > 0,dfrs[[i]][,"horizPos1"], 360-abs(dfrs[[i]][,"horizPos1"]))
     ## convert tracks
   }
@@ -80,27 +77,60 @@ SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, add
   coordinates(settlers)=~horizPos1 + horizPos2
   s = over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
   
-  StartInRegion = data.frame(Region = 1:27, NumStarters = rep(NA, 27))
+  SettleInZone = data.frame(Region = 1:27, NumSettlers = rep(NA, 27))
   for (i in 1:27){
-    x = nrow(subset(starters, Region==i))
-    StartInRegion[i,2] = x
+    x = nrow(subset(settlers, Region==i))
+    SettleInZone[i,2] = x
   }
   
-  ## plot starters and settlers
-  if(add==FALSE){windows(width = 12, height = 12);getBeringMap()}
-  if(addStarters==TRUE){points(starters$horizPos2~starters$horizPos1, cex=1, col="blue", pch=15)}
-  if(addSettlers==TRUE){points(settlers$horizPos2~settlers$horizPos1, cex=1, col="yellow", pch=15)}
-  
-  X = as.data.frame(cbind(settlers$horizPos1,settlers$horizPos2))
-  X = subset(X, V1 > 182 )
-  X = as.matrix(X)
   
  
-  return(
-  ellipse(center = colMeans(X), shape = cov(X),radius = sqrt(qchisq(conf, df=2)),
-          col=cl,fill = TRUE, fill.alpha = alpha,
-          center.pch = 17, center.cex = 2)
-  )
+  
+  ZoneArea = c(45467923122.099998,48733983826.099998,41876641917.599998,29150756998.799999,50041280842.699997,28156982144.700001,
+               48463658481.400002,32175199970.5,     43058333151.599998,51965675314.099998,4310824373.58,
+               36272213040.599998,43645241013.099998,31182972193.700001,46377460312.400002,73897745180.199997,
+               65750246504.099998,67469098918.199997,24266122353.799999,67796246840.199997,28853274483.599998,
+               42299337357.599998,22181812802.799999,261250592356,156851996233,104870483607,29208450343.400002)
+  
+  
+  SettleInZone = cbind(SettleInZone,ZoneArea)
+  
+  SettleInZone$Density = SettleInZone$NumSettlers/SettleInZone$ZoneArea
+  
+  SettleInZone$ColorCode = ((SettleInZone$Density-min(SettleInZone$Density))/
+                              (max(SettleInZone$Density)-min(SettleInZone$Density))*100)
+  
+  RegionCode = data.frame(MapRegion = ConGrid1$Region, MapOrder = 1:27 )
+  RegionCode <- RegionCode[order(RegionCode$MapRegion),]
+  
+   ## plot starters and settlers
+  
+  
+  #create map
+  
+if (Map==TRUE){
+ windows(width = 12, height = 12);getBeringMap(addGrid=FALSE,addDepth=FALSE)
+ #mypal <- colorRampPalette(c("blue", "cyan", "yellow", "red", "darkred"))
+ mypal <- colorRampPalette(c("blue", "white", "red"))
+  for (i in RegionCode[1:27,2]){
+   
+    c = SettleInZone$ColorCode[i]
+    if(c<1){c=c+1}
+    plot(ConGrid1[i,], col=mypal(100)[c], add=TRUE)
+   }
+  
+  if(addSettlers==TRUE){points(settlers$horizPos2~settlers$horizPos1, cex=1, col="yellow", pch=15)}
 }
  
+  
+  return(SettleInZone[,1:4])
+  
+  
+} 
+  
+  
+  
+  
+  
+  
   

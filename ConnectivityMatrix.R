@@ -1,38 +1,42 @@
-# Centroid and spread of settled individuals 
-#
+# connectivity between zones
+
 #'
-#'@title Take disMELS output file dfrs (from readAllResults) and produce a map that calculates centroid and spread of settled individuals
+#'@title Take disMELS output file dfrs (from readAllResults) and produces a connectivity matrix
 #'
-#'@description Function to produce centroid and spread of settled individuals
+#'@description Function to produce connectivity matrix.
 #'
-#'@return map showing centroid and spread of settled individuals
-#'@export
+#'@return a matrix showing connectivity between zones
 
 require(RCurl)
 require(diagram)
-require(car)
-require(raster)
 
 source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
 source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
 source("https://github.com/torrem/SnowCrabFunctions/raw/master/BeringMap.R");
 
-info<-getLifeStageInfo.SnowCrab();
-typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
-
-SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, addStarters=FALSE, 
-                      addSettlers=TRUE){
+ConnMatrix <-function(resdr){
   
+  #resfn<-"results.";
+  #confn<-"resultsConn.csv";
   load(paste(resdr,"/dfrs.RData",sep="")) 
   
+  
+  
+  info<-getLifeStageInfo.SnowCrab();
+  typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
+  
+  
+  
+  
   #create basemap
+  
   #dev.new(width=6, height=6, unit="in")
   #windows(width = 12, height = 12);getBeringMap()
   
   
   ## convert coordinates to work with map ##
   for (i in 1:length(typeNames)){
-   # print(paste("Convertving Coordinates for", typeNames[i]))
+    print(paste("Convertving Coordinates for", typeNames[i]))
     dfrs[[i]][,"horizPos1"]  = ifelse(dfrs[[i]][,"horizPos1"] > 0,dfrs[[i]][,"horizPos1"], 360-abs(dfrs[[i]][,"horizPos1"]))
     ## convert tracks
   }
@@ -57,6 +61,9 @@ SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, add
   }
   
   ## Find starters and settlers ##
+  
+  #con = readr::read_csv(file=paste(resdr,"/",confn, sep=""))
+  #con$horizPos1 = ifelse(con$horizPos1 > 0,con$horizPos1, 360-abs(con$horizPos1) )
   
   dfrs[[1]]$starter = ifelse(as.character(dfrs[[1]]$startTime) == as.character(dfrs[[1]]$time), 1,0)
   
@@ -86,21 +93,34 @@ SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, add
     StartInRegion[i,2] = x
   }
   
-  ## plot starters and settlers
-  if(add==FALSE){windows(width = 12, height = 12);getBeringMap()}
-  if(addStarters==TRUE){points(starters$horizPos2~starters$horizPos1, cex=1, col="blue", pch=15)}
-  if(addSettlers==TRUE){points(settlers$horizPos2~settlers$horizPos1, cex=1, col="yellow", pch=15)}
+  ConnectMatrix = matrix(nrow=27, ncol = 27, dimnames=list(c(1:27),c(1:27)))
   
-  X = as.data.frame(cbind(settlers$horizPos1,settlers$horizPos2))
-  X = subset(X, V1 > 182 )
-  X = as.matrix(X)
+  for (i in 1:27){
+    x = subset(settlers, Region==i)
+    y = as.data.frame(table(starters[x$origID,]$Region))
+    
+    #print(nrow(x))
+    if (nrow(x) > 0){
+      for (k in 1:nrow(y)){
+        ConnectMatrix[as.numeric(paste(y[k,1])),i] = y[k,2]
+      }
+    }
+  }
   
- 
-  return(
-  ellipse(center = colMeans(X), shape = cov(X),radius = sqrt(qchisq(conf, df=2)),
-          col=cl,fill = TRUE, fill.alpha = alpha,
-          center.pch = 17, center.cex = 2)
-  )
+  
+  ConnectMatrix[is.na(ConnectMatrix)] = 0
+  
+  for (i in 1:ncol(ConnectMatrix)){
+    ConnectMatrix[,i] = round(((ConnectMatrix[,i]/StartInRegion[,2])*100),1)
+  }
+  
+  ConnectMatrix[is.nan(ConnectMatrix)] = 0
+  
+  return(ConnectMatrix)
+
 }
+
+
  
-  
+
+

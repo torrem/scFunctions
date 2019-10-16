@@ -7,15 +7,25 @@
 #'
 #'@return frequency plot that shows time of settle
 #'
-#'@export
 #'
-
 require(ggplot2)
 
-SettleMonthC <-function(x, y, col1="blue", col2="red"){
+TR2000 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2000"
+TR2001 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2001"
+TR2002 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2002"
+TR2003 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2003"
+
+TR2041 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2041"
+TR2042 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2042"
+TR2043 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2043"
+TR2044 = "C:/Users/Mike/Documents/Snow Crab/Dismels Runs/Batch Run/2044"
+
+
+x = list(TR2000 = TR2000, TR2001 = TR2001, TR2002 = TR2002, TR2003 = TR2003)
+y = list(TR2041 = TR2041, TR2042 = TR2042, TR2043 = TR2043, TR2044 = TR2044)
 
 FreqTableX = data.frame(Breaks = seq(1,12,by=1))
-25000.0
+
 for (i in 1:length(x)){
   resdr = x[i]
   load(paste(resdr,"/dfrs.RData",sep=""))
@@ -55,25 +65,24 @@ FreqTableY$mean = apply(FreqTableY[,c(seq(2,length(x)+1,by=1))],1, mean)
 ##### Freq plot
 
 d = data.frame(cbind(c(FreqTableX$Breaks, FreqTableY$Breaks),c(FreqTableX$mean,FreqTableY$mean),
-                     c(rep('Hindcast',12), rep('Forecast',12))))
-colnames(d) <- c("breaks", "freq", "Period")
+                     c(rep('X',12), rep('Y',12))))
+colnames(d) <- c("breaks", "freq", "group")
 d$br = as.numeric(as.character(d$breaks))
 d$breaks = as.factor(as.numeric(as.character(d$breaks)))
 d$freq = as.numeric(as.character(d$freq))
 d = d[order(d[,4]),]
-d$Period = factor(d$Period, levels = c("Hindcast", "Forecast"))
 
-SMCplot = ggplot(d, aes(x=breaks, y=freq, fill=Period)) +
+ggplot(d, aes(x=breaks, y=freq, fill=group)) +
   theme_bw(base_size = 24)+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        legend.position="none")+
   geom_bar(stat='identity',position="dodge", width = 0.5)+
-  scale_fill_manual(values=c(col1, col2))+
+  scale_fill_manual(values=c('blue', 'red'))+
   scale_x_discrete(breaks = unique(d$br), labels=c(1:12))+
   labs(x="Settle Month",y="Frequency")
 
-return(SMCplot)
 
-}
+
 
 
 
