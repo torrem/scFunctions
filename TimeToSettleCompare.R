@@ -15,7 +15,7 @@ require(ggplot2)
 SettleMonthC <-function(x, y, col1="blue", col2="red"){
 
 FreqTableX = data.frame(Breaks = seq(1,12,by=1))
-25000.0
+
 for (i in 1:length(x)){
   resdr = x[i]
   load(paste(resdr,"/dfrs.RData",sep=""))
