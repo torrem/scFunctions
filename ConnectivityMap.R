@@ -60,8 +60,8 @@ CMlist <- vector("list", 2)
   #starters = starters[!duplicated(starters$origID), ]
 
   settlers = dfrs[[5]]
-  settlers = settlers[!duplicated(settlers$origID), ]
-
+  #settlers = settlers[!duplicated(settlers$origID), ]
+  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
 
 
@@ -170,17 +170,23 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 
 
         if (i==k){
+          ValCol = ConnectMatrix[k,i]/35*100;if(ValCol>100){ValCol==100}
+          ValLWD = ConnectMatrix[k,i]/35*10;if(ValCol>10){ValCol==10}
+
           diagram::curvedarrow(from = c(ArrowCoords[i,2], ArrowCoords[i,3]), to = c(ArrowCoords[i,2], ArrowCoords[i,3]) + c(0.8,0),
                                curve = -1, arr.pos = 1, arr.type="triangle",
-                               arr.col = col(100)[ConnectMatrix[k,i]/max(ConnectMatrix)*100],
-                               lcol=col(100)[ConnectMatrix[k,i]/max(ConnectMatrix)*100],
-                               lwd = LW[ConnectMatrix[k,i]/max(ConnectMatrix)*10])
+                               arr.col = col(100)[ValCol],
+                               lcol=col(100)[ValCol],
+                               lwd = LW[ValLWD])
         }
 
         else{
+          ValCol = ConnectMatrix[k,i]/35*100;if(ValCol>100){ValCol==100}
+          ValLWD = ConnectMatrix[k,i]/35*10;if(ValCol>10){ValCol==10}
+
           arrows(ArrowCoords[k,2], ArrowCoords[k,3], ArrowCoords[i,2], ArrowCoords[i,3],
-                 col=col(100)[ConnectMatrix[k,i]/max(ConnectMatrix)*100],
-                 lwd = LW[ConnectMatrix[k,i]/max(ConnectMatrix)*10])
+                 col=col(100)[ValCol],
+                 lwd = LW[ValLWD])
         }
       }
   }

@@ -19,9 +19,9 @@ FreqTableX = data.frame(Breaks = seq(1,12,by=1))
 for (i in 1:length(x)){
   resdr = x[i]
   load(paste(resdr,"/dfrs.RData",sep=""))
-  if (length(dfrs) < 5) break
+  #if (length(dfrs) < 5) next
   settlers = dfrs[[5]]
-  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]
+  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
   settlers$month = substr(settlers$time, start = 6, stop = 7)
   settlers$month = as.numeric(settlers$month)
@@ -39,9 +39,9 @@ FreqTableY = data.frame(Breaks = seq(1,12,by=1))
 for (i in 1:length(y)){
   resdr = y[i]
   load(paste(resdr,"/dfrs.RData",sep=""))
-  if (length(dfrs) < 5) break
+  #if (length(dfrs) < 5) next
   settlers = dfrs[[5]]
-  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]
+  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
   settlers$month = substr(settlers$time, start = 6, stop = 7)
   settlers$month = as.numeric(settlers$month)

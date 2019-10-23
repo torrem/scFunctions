@@ -62,7 +62,7 @@ SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, add
 
   starters = subset(dfrs[[1]], starter==1)
   settlers = dfrs[[5]]
-  settlers = settlers[!duplicated(settlers$origID), ]
+  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
   ## Connectivity Matrix ##
 
