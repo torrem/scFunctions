@@ -20,14 +20,14 @@ source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R"
 info<-getLifeStageInfo.SnowCrab();
 typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
-SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, addStarters=FALSE,
-                      addSettlers=TRUE){
+CentroidMap <-function(group, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE){
 
-  load(paste(resdr,"/dfrs.RData",sep=""))
 
-  #create basemap
-  #dev.new(width=6, height=6, unit="in")
-  #windows(width = 12, height = 12);getBeringMap()
+   CMlist <- vector("list", 2)
+  XMean = vector("list",2)
+
+  for (kk in 1:length(group)){
+    load(paste(group[kk],"/dfrs.RData",sep=""))
 
 
   ## convert coordinates to work with map ##
@@ -58,46 +58,35 @@ SettledMap <-function(resdr, conf = 0.5, cl = 'green', alpha=0.3, add=FALSE, add
 
   ## Find starters and settlers ##
 
-  dfrs[[1]]$starter = ifelse(as.character(dfrs[[1]]$startTime) == as.character(dfrs[[1]]$time), 1,0)
-
-  starters = subset(dfrs[[1]], starter==1)
   settlers = dfrs[[5]]
   settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
-  ## Connectivity Matrix ##
 
-  ## pull out starters from Z1 in dfrs
-  starters = starters[!is.na(starters$horizPos1) & !is.na(starters$horizPos2),]
-  coordinates(starters)=~horizPos1 + horizPos2
-  s = over(starters, ConGrid1); starters= cbind(data.frame(starters),s) ## match ResultsConn file to connectivity grid
-
-  ## Get rid of starters that are on the fringe of sink regions
-  h = table(starters$Region)
-  starters = subset(starters,!(Region %in% as.numeric(names(which(h < max(h)* 0.16)))))
-
-  ## Pull out Settlers (C1M & C1F) from dfrs
-  settlers = settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),]
-  coordinates(settlers)=~horizPos1 + horizPos2
-  s = over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
-
-  StartInRegion = data.frame(Region = 1:27, NumStarters = rep(NA, 27))
-  for (i in 1:27){
-    x = nrow(subset(starters, Region==i))
-    StartInRegion[i,2] = x
-  }
 
   ## plot starters and settlers
-  if(add==FALSE){windows(width = 12, height = 12);getBeringMap()}
-  if(addStarters==TRUE){points(starters$horizPos2~starters$horizPos1, cex=1, col="blue", pch=15)}
-  if(addSettlers==TRUE){points(settlers$horizPos2~settlers$horizPos1, cex=1, col="yellow", pch=15)}
+
 
   X = as.data.frame(cbind(settlers$horizPos1,settlers$horizPos2))
   X = subset(X, V1 > 182 )
   X = as.matrix(X)
 
+  CMlist[[kk]] = cov(X)
+  names(CMlist)[kk] = paste("CM",names(group[kk]), sep="")
+
+  XMean[[kk]] = colMeans(X)
+  names(XMean)[kk] = paste("Mean",names(group[kk]), sep="")
+
+  print(paste("calculating centroid spread for: ",names(group[kk])), sep="")
+  }
+
+  covX = apply(simplify2array(CMlist), 1:2, mean)
+  colmeanX =  apply(simplify2array(XMean), 1:2, mean)
+  colmeanX = rowMeans(colmeanX)
+
+  if(add==FALSE){windows(width = 12, height = 12);getBeringMap()}
 
   return(
-  ellipse(center = colMeans(X), shape = cov(X),radius = sqrt(qchisq(conf, df=2)),
+  ellipse(center = colmeanX, shape = covX,radius = sqrt(qchisq(conf, df=2)),
           col=cl,fill = TRUE, fill.alpha = alpha,
           center.pch = 17, center.cex = 2)
   )
