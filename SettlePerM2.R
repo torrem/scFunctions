@@ -109,7 +109,7 @@ SettlePerM2 <-function(group){
 
 
 
-if (Map==TRUE){
+
  windows(width = 12, height = 12);getBeringMap(addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
  #mypal <- colorRampPalette(c("blue", "cyan", "yellow", "red", "darkred"))
@@ -135,7 +135,7 @@ if (Map==TRUE){
          y.intersp = 0.5,
          cex = 1.5, text.font = 2)
 
-}
+
 
 
   #return(SettleInZone[,1:4])
