@@ -20,7 +20,7 @@ source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R"
 info<-getLifeStageInfo.SnowCrab();
 typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
-SettlePerM2 <-function(resdr, Map=FALSE, addSettlers=TRUE){
+SettlePerM2 <-function(group){
 
 
 
@@ -135,7 +135,6 @@ if (Map==TRUE){
          y.intersp = 0.5,
          cex = 1.5, text.font = 2)
 
-  if(addSettlers==TRUE){points(settlers$horizPos2~settlers$horizPos1, cex=1, col="green", pch=15)}
 }
 
 
