@@ -10,9 +10,6 @@
 #'@export
 #'
 #'
-group1 = A
-group2 = B
-
 require(ggplot2)
 
 SettleMonthC <-function(group1, group2, col1="blue", col2="red"){
