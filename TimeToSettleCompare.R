@@ -9,15 +9,18 @@
 #'
 #'@export
 #'
+#'
+group1 = A
+group2 = B
 
 require(ggplot2)
 
-SettleMonthC <-function(x, y, col1="blue", col2="red"){
+SettleMonthC <-function(group1, group2, col1="blue", col2="red"){
 
 FreqTableX = data.frame(Breaks = seq(1,12,by=1))
 
-for (i in 1:length(x)){
-  resdr = x[i]
+for (i in 1:length(group1)){
+  resdr = group1[i]
   load(paste(resdr,"/dfrs.RData",sep=""))
   #if (length(dfrs) < 5) next
   settlers = dfrs[[5]]
@@ -29,15 +32,15 @@ for (i in 1:length(x)){
   hist = hist(settlers$month, breaks = seq(0,12, by=1), plot=FALSE)
   counts = hist$counts
   FreqTableX$counts = counts
-  colnames(FreqTableX)[i+1] = paste(names(x)[i])
+  colnames(FreqTableX)[i+1] = paste(names(group1)[i])
 }
-FreqTableX$mean = apply(FreqTableX[,c(seq(2,length(x)+1,by=1))],1, mean)
+FreqTableX$mean = apply(FreqTableX[,c(seq(2,length(group1)+1,by=1))],1, mean)
 
 ##
 FreqTableY = data.frame(Breaks = seq(1,12,by=1))
 
-for (i in 1:length(y)){
-  resdr = y[i]
+for (i in 1:length(group2)){
+  resdr = group2[i]
   load(paste(resdr,"/dfrs.RData",sep=""))
   #if (length(dfrs) < 5) next
   settlers = dfrs[[5]]
@@ -49,23 +52,25 @@ for (i in 1:length(y)){
   hist = hist(settlers$month, breaks = seq(0,12, by=1), plot=FALSE)
   counts = hist$counts
   FreqTableY$counts = counts
-  colnames(FreqTableY)[i+1] = paste(names(x)[i])
+  colnames(FreqTableY)[i+1] = paste(names(group2)[i])
 }
-FreqTableY$mean = apply(FreqTableY[,c(seq(2,length(x)+1,by=1))],1, mean)
+FreqTableY$mean = apply(FreqTableY[,c(seq(2,length(group2)+1,by=1))],1, mean)
 
 
 ##### Freq plot
 
 d = data.frame(cbind(c(FreqTableX$Breaks, FreqTableY$Breaks),c(FreqTableX$mean,FreqTableY$mean),
-                     c(rep('Hindcast',12), rep('Forecast',12))))
+                     c(rep(paste(names(group1)[1],names(group1)[length(group1)]   , sep=" - "),12),
+                       rep(paste(names(group2)[1],names(group2)[length(group2)]   , sep=" - "),12))))
 colnames(d) <- c("breaks", "freq", "Period")
 d$br = as.numeric(as.character(d$breaks))
 d$breaks = as.factor(as.numeric(as.character(d$breaks)))
 d$freq = as.numeric(as.character(d$freq))
 d = d[order(d[,4]),]
-d$Period = factor(d$Period, levels = c("Hindcast", "Forecast"))
+d$Period = factor(d$Period, levels = c(paste(names(group1)[1],names(group1)[length(group1)]   , sep=" - "),
+                                       paste(names(group2)[1],names(group2)[length(group2)]   , sep=" - ")))
 
-SMCplot = ggplot(d, aes(x=breaks, y=freq, fill=Period)) +
+SMCplot =  ggplot(d, aes(x=breaks, y=freq, fill=Period)) +
   theme_bw(base_size = 24)+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   geom_bar(stat='identity',position="dodge", width = 0.5)+

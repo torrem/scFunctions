@@ -17,14 +17,14 @@ source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R"
 info<-getLifeStageInfo.SnowCrab();
 typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
-ConnMap <-function(x){
+ConnMap <-function(group){
 
 
 CMlist <- vector("list", 2)
 
- for (kk in 1:length(x)){
+ for (kk in 1:length(group)){
  #for (kk in 1:3){
-  resdr = x[kk]
+  resdr = group[kk]
   load(paste(resdr,"/dfrs.RData",sep=""))
   ## convert coordinates to work with map ##
   for (i in 1:length(typeNames)){
@@ -112,9 +112,9 @@ CMlist <- vector("list", 2)
 
 
   CMlist[[kk]] = ConnectMatrix
-names(CMlist)[kk] = paste("CM",names(x[kk]), sep="")
+names(CMlist)[kk] = paste("CM",names(group[kk]), sep="")
 
-print(paste("calculating connecivity matrix for: ",names(x[kk])), sep="")
+print(paste("calculating connecivity matrix for: ",names(group[kk])), sep="")
    }
 
 ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
