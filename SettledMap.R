@@ -59,7 +59,7 @@ SettledMap <-function(group, path, cl = 'green'){
 
   ## plot starters and settlers
 
-  png(paste(path,"/SettleMap_",names(group)[kk],".png",sep=""), width = 15, height = 10, units = "in", res = 200)
+  png(paste(path,"/SettleMap_",names(group)[kk],".png",sep=""), width = 12, height = 12, units = "in", res = 200)
 
   getBeringMap()
   points(settlers$horizPos2~settlers$horizPos1, cex=1, col=cl, pch=15)
