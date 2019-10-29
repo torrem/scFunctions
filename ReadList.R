@@ -44,10 +44,10 @@ ReadList <-function(FoldDir){
     ## make A dfrs for each item in list ##
     for(i in 1:length(A)){
       if (     ("dfrs.RData" %in% list.files(path = paste(A[i])))==TRUE          ){
-        print(paste(Afold[i], " has already been formatted", sep=""))
+        print(paste(names(A)[i], " has already been formatted", sep=""))
       }
       if (     ("dfrs.RData" %in% list.files(path = paste(A[i])))==FALSE          ){
-        print(paste("formatting ",Afold[i], sep=""))
+        print(paste("formatting ",names(A)[i], sep=""))
         readResults(resdr = A[i], resfn = 'results.' )
       }
 
