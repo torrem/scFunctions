@@ -129,14 +129,14 @@ AvgTemp <-function(group1, group2, group3,
   ggplot(FreqTableXYZ, aes(x = Life_Stage, y = Temp)) +
     geom_boxplot(width = 0.7, fill = "white",outlier.shape = NA) +
     facet_wrap(~ Group)+
-    theme(legend.position = "none")+
+    theme(legend.position="bottom")+
      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
     geom_jitter(aes(color = Life_Stage, shape = Life_Stage),
                 width = 0.2, size = 1.5) +
     # geom_hline(aes(yintercept = grp.mean, color = Life_Stage),
     #            data = mu, linetype = "dashed", lwd=1) +
     scale_color_manual(values = c("grey","#00AFBB", "#E7B800"))+
-    labs(x = 'Life stage', y = 'Mean temperature (C)')
+    labs(x = NULL, y = 'Mean temperature (C)')
 
 
 
