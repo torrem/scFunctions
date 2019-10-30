@@ -13,7 +13,7 @@
 
 
 
-ReadList <-function(FoldDir){
+ReadList <-function(FoldDir, groupname = 'GG'){
 
 #### Read in lists---------------
 
@@ -26,7 +26,7 @@ ReadList <-function(FoldDir){
     A = list()
     for (i in 1:length(Afold)){
       A[i] = paste(Aresd,"/",Afold[i],sep="")
-      names(A)[i]= paste('A',Afold[i], sep="")
+      names(A)[i]= paste(groupname,Afold[i], sep="")
     }
 
     ## check each batch run and get rid of Years with no settlers ##
