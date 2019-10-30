@@ -17,60 +17,99 @@ AvgTemp <-function(group1, group2, group3,
                    g1name ="Hindcast", g2name = "RCP4.5", g3name = "RCP8.5",
                    col1='dimgrey', col2='#0073C2FF', col3='coral'){
 
-  FreqTableX = vector()
+  FreqTableX = setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("Life_Stage", "Temp"))
 
   for (i in 1:length(group1)){
     resdr = group1[i]
     load(paste(resdr,"/dfrs.RData",sep=""))
-    #if (length(dfrs) < 5) next
+
+    Z1 = dfrs[[1]]
+    Z2 = dfrs[[2]]
+    M = dfrs[[3]]
+
     settlers = dfrs[[5]]
     settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
-    settlers$age_in_days<- as.numeric(round(difftime(settlers$time,settlers$startTime , units = c("days"))))
 
-    FreqTableX = c(FreqTableX,settlers$age_in_days)
+    for (kk in sample(settlers$origID,100)){
+
+      Z1T = data.frame(Life_Stage = "Z1",Temp = mean(Z1[which(Z1$origID==kk),22]))
+      Z2T = data.frame(Life_Stage = "Z2",Temp = mean(Z2[which(Z2$origID==kk),22]))
+      MT = data.frame(Life_Stage = "M",Temp = mean(M[which(M$origID==kk),22]))
+      FreqTableX = rbind(FreqTableX,Z1T, Z2T, MT)
+    }
+
+
     print(paste("reading: ",names(group1[i])), sep="")
   }
+  FreqTableX$Group = rep(g1name, nrow(FreqTableX))
 
-  FreqTableX = as.data.frame(FreqTableX); FreqTableX$Group = rep(g1name, nrow(FreqTableX));colnames(FreqTableX)[1]="Age"
 
 
-  FreqTableY = vector()
+
+
+  FreqTableY = setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("Life_Stage", "Temp"))
 
   for (i in 1:length(group2)){
     resdr = group2[i]
     load(paste(resdr,"/dfrs.RData",sep=""))
-    #if (length(dfrs) < 5) next
+
+    Z1 = dfrs[[1]]
+    Z2 = dfrs[[2]]
+    M = dfrs[[3]]
+
     settlers = dfrs[[5]]
     settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
-    settlers$age_in_days<- as.numeric(round(difftime(settlers$time,settlers$startTime , units = c("days"))))
 
-    FreqTableY = c(FreqTableY,settlers$age_in_days)
+    for (kk in sample(settlers$origID,100)){
+
+      Z1T = data.frame(Life_Stage = "Z1",Temp = mean(Z1[which(Z1$origID==kk),22]))
+      Z2T = data.frame(Life_Stage = "Z2",Temp = mean(Z2[which(Z2$origID==kk),22]))
+      MT = data.frame(Life_Stage = "M",Temp = mean(M[which(M$origID==kk),22]))
+      FreqTableY = rbind(FreqTableY,Z1T, Z2T, MT)
+    }
+
+
     print(paste("reading: ",names(group2[i])), sep="")
   }
 
-  FreqTableY = as.data.frame(FreqTableY); FreqTableY$Group = rep(g2name, nrow(FreqTableY));colnames(FreqTableY)[1]="Age"
+  FreqTableY$Group = rep(g2name, nrow(FreqTableY))
 
 
 
 
-  FreqTableZ = vector()
+
+
+
+  FreqTableZ = setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("Life_Stage", "Temp"))
 
   for (i in 1:length(group3)){
     resdr = group3[i]
     load(paste(resdr,"/dfrs.RData",sep=""))
-    #if (length(dfrs) < 5) next
+
+    Z1 = dfrs[[1]]
+    Z2 = dfrs[[2]]
+    M = dfrs[[3]]
+
     settlers = dfrs[[5]]
     settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
-    settlers$age_in_days<- as.numeric(round(difftime(settlers$time,settlers$startTime , units = c("days"))))
 
-    FreqTableZ = c(FreqTableZ,settlers$age_in_days)
-    print(paste("reading: ",names(group3[i])), sep="")
+    for (kk in sample(settlers$origID,100)){
+
+      Z1T = data.frame(Life_Stage = "Z1",Temp = mean(Z1[which(Z1$origID==kk),22]))
+      Z2T = data.frame(Life_Stage = "Z2",Temp = mean(Z2[which(Z2$origID==kk),22]))
+      MT = data.frame(Life_Stage = "M",Temp = mean(M[which(M$origID==kk),22]))
+      FreqTableZ = rbind(FreqTableZ,Z1T, Z2T, MT)
+    }
+
+
+    print(paste("reading: ",names(group1[i])), sep="")
   }
+  FreqTableZ$Group = rep(g3name, nrow(FreqTableZ))
 
-  FreqTableZ = as.data.frame(FreqTableZ); FreqTableZ$Group = rep(g3name, nrow(FreqTableZ));colnames(FreqTableZ)[1]="Age"
+
 
 
 
@@ -79,12 +118,24 @@ AvgTemp <-function(group1, group2, group3,
 
 
 
+  mu <- FreqTableXYZ %>%
+    group_by(Group,Life_Stage) %>%
+    summarise(grp.mean = mean(Temp))
+  mu
 
 
 
-
-
-
+  windows(width = 12, height = 12)
+  ggplot(FreqTableXYZ, aes(x = Life_Stage, y = Temp)) +
+    geom_boxplot(width = 0.7, fill = "white",outlier.shape = NA) +
+    facet_wrap(~ Group)+
+    theme(legend.position = "none")+
+    geom_jitter(aes(color = Life_Stage, shape = Life_Stage),
+                width = 0.2, size = 1.5) +
+    # geom_hline(aes(yintercept = grp.mean, color = Life_Stage),
+    #            data = mu, linetype = "dashed", lwd=1) +
+    scale_color_manual(values = c("grey","#00AFBB", "#E7B800"))+
+    labs(x = 'Life stage', y = 'Mean temperature (C)')
 
 
 
