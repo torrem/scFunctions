@@ -130,6 +130,7 @@ AvgTemp <-function(group1, group2, group3,
     geom_boxplot(width = 0.7, fill = "white",outlier.shape = NA) +
     facet_wrap(~ Group)+
     theme(legend.position = "none")+
+     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
     geom_jitter(aes(color = Life_Stage, shape = Life_Stage),
                 width = 0.2, size = 1.5) +
     # geom_hline(aes(yintercept = grp.mean, color = Life_Stage),
