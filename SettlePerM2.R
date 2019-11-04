@@ -65,13 +65,25 @@ SettlePerM2 <-function(group){
   ## Pull out Settlers (C1M & C1F) from dfrs
   settlers = settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),]
   coordinates(settlers)=~horizPos1 + horizPos2
-  s = over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
+  s = over(settlers, ConGrid1);s$Region[is.na(s$Region)] <- 999
+
+
+  RegionCode = data.frame(MapRegion = ConGrid1$Region, MapOrder = 1:27 )
+
+  ##change congrid1 region code to connectivity zone code on my map ##
+  # for (i in 1:15){
+  #   if (s[i,2]==999){next}
+  #   s[i,2] = RegionCode[which(RegionCode[,2]==s[i,2]),1]
+  #
+  # }
+
+
+  settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
+
+
 
   SettleInZone = data.frame(Region = 1:27, NumSettlers = rep(NA, 27))
-  for (i in 1:27){
-    x = nrow(subset(settlers, Region==i))
-    SettleInZone[i,2] = x
-  }
+
 
 
 
@@ -82,13 +94,26 @@ SettlePerM2 <-function(group){
                65750246504.099998,67469098918.199997,24266122353.799999,67796246840.199997,28853274483.599998,
                42299337357.599998,22181812802.799999,261250592356,156851996233,104870483607,29208450343.400002)
 
-
   SettleInZone = cbind(SettleInZone,ZoneArea)
+
+
+ # SettleInZone$Region = RegionCode$MapRegion
+
+  SettleInZone$R2 = RegionCode$MapRegion
+  #SettleInZone <- SettleInZone[order(SettleInZone$R2),]
+
+    for (i in 1:27){
+      x = nrow(subset(settlers, Region==i))
+      SettleInZone[i,2] = x
+    }
+
+
 
   SettleInZone$Density = SettleInZone$NumSettlers/SettleInZone$ZoneArea
 
   ##add density to SIZ
-  SIZ$r = SettleInZone$Density; colnames(SIZ)[kk+1] = paste(names(group[kk]))
+  SIZ$r = SettleInZone$Density;
+  colnames(SIZ)[kk+1] = paste(names(group[kk]))
   }
 
   ### take mean of SIZ
@@ -99,8 +124,7 @@ SettlePerM2 <-function(group){
   SettleInZone$ColorCode = ifelse(round((SettleInZone$Density/0.00000001)*9)>9,
                                   9,round((SettleInZone$Density/0.00000001)*9) )
 
-  RegionCode = data.frame(MapRegion = ConGrid1$Region, MapOrder = 1:27 )
-  RegionCode <- RegionCode[order(RegionCode$MapRegion),]
+
 
    ## plot starters and settlers
 
@@ -110,17 +134,19 @@ SettlePerM2 <-function(group){
 
 
 
- windows(width = 12, height = 12);getBeringMap(addGrid=FALSE,addDepth=FALSE)
+ windows(width = 8, height = 8);getBeringMap(addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
  #mypal <- colorRampPalette(c("blue", "cyan", "yellow", "red", "darkred"))
  #mypal <- colorRampPalette(c("blue", "lightblue1", "lightpink", "red"))
- for (i in RegionCode[1:27,2]){
+ for (i in 1:27){
 
-
+    ii = which(SettleInZone[,4]==i)
     c = SettleInZone$ColorCode[i]
     if(c<1){c=c+1}
-    plot(ConGrid1[i,], col=rev(brewer.pal(9,"RdYlBu"))[c], add=TRUE)
-    }
+    plot(ConGrid1[ii,], col=rev(brewer.pal(9,"RdYlBu"))[c], add=TRUE)
+ }
+
+
   lgd_ = rep(NA, 9)
   lgd_[c(1,5,9)] = c("1 x 10^-8","5 x 10^-9",0)
 
