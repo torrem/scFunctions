@@ -134,7 +134,7 @@ SettlePerM2 <-function(group){
 
 
 
- windows(width = 8, height = 8);getBeringMap(addGrid=FALSE,addDepth=FALSE)
+ windows(width = 12, height = 12);getBeringMap(addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
  #mypal <- colorRampPalette(c("blue", "cyan", "yellow", "red", "darkred"))
  #mypal <- colorRampPalette(c("blue", "lightblue1", "lightpink", "red"))
