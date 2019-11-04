@@ -121,8 +121,8 @@ SettlePerM2 <-function(group){
 
   SettleInZone$Density = SIZ$Mean
 
-  SettleInZone$ColorCode = ifelse(round((SettleInZone$Density/0.00000001)*9)>9,
-                                  9,round((SettleInZone$Density/0.00000001)*9) )
+  SettleInZone$ColorCode = ifelse(round((SettleInZone$Density/max(SettleInZone$Density))*9)>9,
+                                  9,round((SettleInZone$Density/max(SettleInZone$Density))*9) )
 
 
 
