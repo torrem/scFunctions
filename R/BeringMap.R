@@ -15,8 +15,8 @@ require(rangeBuilder)
 
 #setwd("https://github.com/torrem/SnowCrabFunctions.git")
 
-source_data("https://github.com/torrem/SnowCrabFunctions/blob/master/Shapefiles/ConGrid.Rdata?raw=true")
-source_data("https://github.com/torrem/SnowCrabFunctions/blob/master/Shapefiles/ak.Rdata?raw=true")
+#source_data("https://github.com/torrem/SnowCrabFunctions/blob/master/Shapefiles/ConGrid.Rdata?raw=true")
+#source_data("https://github.com/torrem/SnowCrabFunctions/blob/master/Shapefiles/ak.Rdata?raw=true")
 
 getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
 
