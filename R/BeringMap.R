@@ -4,6 +4,8 @@
 #'@description Function to get a Bering Sea basemap.
 #'
 #'@return a base graphic map saved as a pseudo-object in R
+#'
+#'@export
 
 
 require(raster)
