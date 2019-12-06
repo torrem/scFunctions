@@ -13,26 +13,25 @@
 
 
 
-ReadList <-function(FoldDir, groupname = 'GG'){
+ReadList <-function(Group,FoldDir){
 
 #### Read in lists---------------
 
   Aresd = FoldDir
-
     ## make A list##
 
-    Afold =  list.files (pattern = "^[:0-2:][0-9][0-9][0-9]", path = Aresd)
+    Afold =  list.files (pattern = paste(Group,"[:0-2:][0-9][0-9][0-9]",sep="_"), path = Aresd)
 
     A = list()
     for (i in 1:length(Afold)){
       A[i] = paste(Aresd,"/",Afold[i],sep="")
-      names(A)[i]= paste(groupname,Afold[i], sep="")
+      names(A)[i]= paste(Afold[i])
     }
 
     ## check each batch run and get rid of Years with no settlers ##
     rmlist = vector()
     for ( i in 1:length(Afold)){
-      Fsize = file.info(paste(A[[i]],"/results.disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale.csv", sep=""))$size
+      Fsize = file.info(paste(A[[i]],"/Results.Conn.disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale.csv", sep=""))$size
       if (Fsize < 5000){
         rmlist = c(rmlist,i)
         print(paste("removing ", Afold[i], " due to low settler numbers" ,sep=""))
@@ -48,7 +47,7 @@ ReadList <-function(FoldDir, groupname = 'GG'){
       }
       if (     ("dfrs.RData" %in% list.files(path = paste(A[i])))==FALSE          ){
         print(paste("formatting ",names(A)[i], sep=""))
-        readResults(resdr = A[i], resfn = 'results.' )
+        readResults(resdr = A[i], resfn = 'Results.Conn' )
       }
 
     }
