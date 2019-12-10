@@ -9,7 +9,7 @@
 
 
 require(raster)
-library(mapdata)
+require(mapdata)
 require(maptools)
 require(pryr)
 require(repmis)
@@ -32,7 +32,7 @@ getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
 
 #ak2 =raster("C:/Users/Mike/Documents/Snow Crab/Shapefiles/CRM_AK/crm_southak.asc")
 #ak =ak2
-ak =  raster::crop(ak,c(168,210,48,70))
+ak =  crop(ak,c(168,210,48,70))
 ak[ak>=0]<-NA
 
 
@@ -41,7 +41,7 @@ ak[ak>=0]<-NA
 
 m = map('world2Hires',  c('USA:Alaska', 'USSR'),
         fill = TRUE, plot=FALSE, col='grey', xlim= c(175,210))
-m2 <- maptools::map2SpatialPolygons(m, IDs=m$names, proj4string=CRS("+proj=longlat +datum=WGS84"))
+m2 <- map2SpatialPolygons(m, IDs=m$names, proj4string=CRS("+proj=longlat +datum=WGS84"))
 
 #png(filename = "AKMapStartCentSettle.png", res = 600, height = 6, width = 6, units = "in")
 
