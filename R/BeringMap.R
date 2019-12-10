@@ -9,7 +9,7 @@
 
 
 require(raster)
-require(mapdata)
+library(mapdata)
 require(maptools)
 require(pryr)
 require(repmis)
@@ -41,7 +41,7 @@ ak[ak>=0]<-NA
 
 m = map('world2Hires',  c('USA:Alaska', 'USSR'),
         fill = TRUE, plot=FALSE, col='grey', xlim= c(175,210))
-m2 <- map2SpatialPolygons(m, IDs=m$names, proj4string=CRS("+proj=longlat +datum=WGS84"))
+m2 <- maptools::map2SpatialPolygons(m, IDs=m$names, proj4string=CRS("+proj=longlat +datum=WGS84"))
 
 #png(filename = "AKMapStartCentSettle.png", res = 600, height = 6, width = 6, units = "in")
 
