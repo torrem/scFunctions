@@ -32,7 +32,7 @@ getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
 
 #ak2 =raster("C:/Users/Mike/Documents/Snow Crab/Shapefiles/CRM_AK/crm_southak.asc")
 #ak =ak2
-ak =  crop(ak,c(168,210,48,70))
+ak =  raster::crop(ak,c(168,210,48,70))
 ak[ak>=0]<-NA
 
 
