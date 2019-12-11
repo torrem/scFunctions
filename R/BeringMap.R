@@ -21,11 +21,12 @@ require(rangeBuilder)
 #source_data("https://github.com/torrem/scFunctions/blob/master/data/ak.Rdata?raw=true")
 
 
-data(ak)
-data(ConGrid1)
+
 
 getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
 
+  data(ak)
+  data(ConGrid1)
 
 ####--- Add depth raster map with land----#
 
