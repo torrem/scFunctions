@@ -8,18 +8,14 @@
 #'@export
 
 
-require(raster)
-require(mapdata)
-require(maptools)
-require(pryr)
-require(repmis)
-require(rangeBuilder)
+# require(raster)
+# require(mapdata)
+# require(maptools)
+# require(pryr)
+# require(repmis)
+# require(rangeBuilder)
 
 #setwd("https://github.com/torrem/SnowCrabFunctions.git")
-
-
-
-
 
 
 getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
@@ -30,6 +26,8 @@ getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
 
   #repmis::source_data("https://github.com/torrem/scFunctions/blob/master/data/ConGrid.Rdata?raw=true")
   #repmis::source_data("https://github.com/torrem/scFunctions/blob/master/data/ak.Rdata?raw=true")
+
+  windows(width = 12, height = 12)
 
 ####--- Add depth raster map with land----#
 
