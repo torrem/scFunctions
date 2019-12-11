@@ -1,1 +1,7 @@
 exportPattern("^[[:alpha:]]+")
+import(raster)
+import(mapdata)
+import(maptools)
+import(pryr)
+import(repmis)
+import(rangeBuilder)
