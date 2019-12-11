@@ -99,8 +99,6 @@ raster::plot(m2, add=TRUE, col='grey')
 
   if(addGrid==TRUE){plot(ConGrid1,add=TRUE)}
 
-#}
-
-#return(BERMap)
+rm(ak,ConGrid1, m)
 
 }
