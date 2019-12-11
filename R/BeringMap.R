@@ -17,8 +17,7 @@ require(rangeBuilder)
 
 #setwd("https://github.com/torrem/SnowCrabFunctions.git")
 
-#source_data("https://github.com/torrem/scFunctions/blob/master/data/ConGrid.Rdata?raw=true")
-#source_data("https://github.com/torrem/scFunctions/blob/master/data/ak.Rdata?raw=true")
+
 
 
 
@@ -27,6 +26,10 @@ getBeringMap<-function(addGrid=TRUE, addDepth=TRUE){
 
   data(ak)
   data(ConGrid1)
+  data(AlaskaLand)
+
+  #repmis::source_data("https://github.com/torrem/scFunctions/blob/master/data/ConGrid.Rdata?raw=true")
+  #repmis::source_data("https://github.com/torrem/scFunctions/blob/master/data/ak.Rdata?raw=true")
 
 ####--- Add depth raster map with land----#
 
@@ -40,23 +43,24 @@ ak[ak>=0]<-NA
 ### add land###----
 #plot(wrld_simpl, col='grey', xlim = c(min(longGrid), max(longGrid)), ylim = c(min(latGrid),max(latGrid)))
 
-m = mapdata::map('world2Hires',  c('USA:Alaska', 'USSR'),
-        fill = TRUE, plot=FALSE, col='grey', xlim= c(175,210))
-m2 <- maptools::map2SpatialPolygons(m, IDs=m$names, proj4string=CRS("+proj=longlat +datum=WGS84"))
+# m = map('world2Hires',  c('USA:Alaska', 'USSR'),
+#         fill = TRUE, plot=FALSE, col='grey', xlim= c(175,210))
+m2 <- maptools::map2SpatialPolygons(m, IDs=m$names, proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
 
 #png(filename = "AKMapStartCentSettle.png", res = 600, height = 6, width = 6, units = "in")
 
 #colorRampPalette(c("black", "blue" ,"purple","yellow")
 #colorRampPalette(c("red","purple","blue","cadetblue1","white"))
 #dev.new()
-BERMap %<a-%{
-if(addDepth==TRUE){mypal <- colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgoldenrod1","tan1"), bias=0.015)
-plot(ak, col=mypal(10000), yaxs="i", legend=FALSE)
+#BERMap %<a-%{
+if(addDepth==TRUE){
+  mypal <- colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgoldenrod1","tan1"), bias=0.015)
+raster::plot(ak, col=mypal(10000), yaxs="i", legend=FALSE)
 mypal1 = colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgoldenrod1","tan1"))
 #addRasterLegend(ak, ramp=mypal1(10000), longFrac=0.8, ncolors = 10000)
 }
 if(addDepth==FALSE){plot(ak, col='White', yaxs="i",legend=FALSE)}
-plot(m2, add=TRUE, col='grey')
+raster::plot(m2, add=TRUE, col='grey')
 #dev.off()
 
 #save(ak, m2, file = "AKMapData.RData")
@@ -97,8 +101,8 @@ plot(m2, add=TRUE, col='grey')
 
   if(addGrid==TRUE){plot(ConGrid1,add=TRUE)}
 
-}
+#}
 
-return(BERMap)
+#return(BERMap)
 
 }
