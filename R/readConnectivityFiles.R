@@ -7,13 +7,13 @@
 #'
 #'@return list of dfrs
 #'
-#'
+#'@export
 #'
 #'
 
-require(RCurl)
-require(getStandardAttributes)
-require(getLifeStageInfo)
+#require(RCurl)
+#require(getStandardAttributes)
+#require(getLifeStageInfo)
 
 #source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
 #source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
