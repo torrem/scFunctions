@@ -12,9 +12,9 @@
 require(RCurl)
 require(diagram)
 
-#source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
-#source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
-#source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R");
+# source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
+# source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
+# source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R");
 
 info<-getLifeStageInfo.SnowCrab();
 typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
@@ -29,11 +29,18 @@ CMlist <- vector("list", 2)
   resdr = group[kk]
   load(paste(resdr,"/dfrs.RData",sep=""))
   ## convert coordinates to work with map ##
-  for (i in 1:length(typeNames)){
+  for (i in c(1,4)){
    # print(paste("Convertving Coordinates for", typeNames[i]))
-    dfrs[[i]][,"horizPos1"]  = ifelse(dfrs[[i]][,"horizPos1"] > 0,dfrs[[i]][,"horizPos1"], 360-abs(dfrs[[i]][,"horizPos1"]))
-    ## convert tracks
+    #dfrs[[]]
+    for (kkk in 1:nrow(dfrs[[i]])){
+    dfrs[[i]][kkk,"horizPos1"]  = ifelse(dfrs[[i]][kkk,"horizPos1"] > 0,dfrs[[i]][kkk,"horizPos1"], 360-abs(dfrs[[i]][kkk,"horizPos1"]))
+    }
+
   }
+
+
+
+
 
   for (i in 1:length(ConGrid1)){
 
@@ -55,13 +62,19 @@ CMlist <- vector("list", 2)
   }
 
   ## Find starters and settlers ##
+  starters = as.data.frame(dfrs[[1]])
 
-  dfrs[[1]]$starter = ifelse(as.character(dfrs[[1]]$startTime) == as.character(dfrs[[1]]$time), 1,0)
+  starters$starter = ifelse(starters$startTime == starters$time, 1,0)
 
-  starters = subset(dfrs[[1]], starter==1)
+  starters = subset(starters, starter==1)
   #starters = starters[!duplicated(starters$origID), ]
 
-  settlers = dfrs[[5]]
+
+
+
+
+
+  settlers = dfrs[[4]]
   #settlers = settlers[!duplicated(settlers$origID), ]
   settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
@@ -71,8 +84,8 @@ CMlist <- vector("list", 2)
 
   ## pull out starters from Z1 in dfrs
   starters = starters[!is.na(starters$horizPos1) & !is.na(starters$horizPos2),]
-  coordinates(starters)=~horizPos1 + horizPos2
-  s = over(starters, ConGrid1); starters= cbind(data.frame(starters),s) ## match ResultsConn file to connectivity grid
+  sp::coordinates(starters)=~horizPos1 + horizPos2
+  s = rgeos::over(starters, ConGrid1); starters= cbind(data.frame(starters),s) ## match ResultsConn file to connectivity grid
 
   ## Get rid of starters that are on the fringe of sink regions
   h = table(starters$Region)
@@ -80,8 +93,8 @@ CMlist <- vector("list", 2)
 
   ## Pull out Settlers (C1M & C1F) from dfrs
   settlers = settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),]
-  coordinates(settlers)=~horizPos1 + horizPos2
-  s = over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
+  sp::coordinates(settlers)=~horizPos1 + horizPos2
+  s = rgeos::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
   StartInRegion = data.frame(Region = 1:27, NumStarters = rep(NA, 27))
   for (i in 1:27){
