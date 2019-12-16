@@ -7,22 +7,22 @@
 #'@description Function to produce map of number of successful individuals per meter in each connectivity region
 #'
 #'@return map of number of successful individuals per meter in each connectivity region
+#'
+#'@export
+#'
+#'
 
 
-require(RCurl)
-require(diagram)
-require(RColorBrewer)
 
-source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
-source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
-source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R");
 
-info<-getLifeStageInfo.SnowCrab();
-typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
+
 
 SettlePerM2 <-function(group){
 
+  info<-getLifeStageInfo.SnowCrab();
+  typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
+  data(ConGrid1)
 
   SIZ = data.frame(Region = 1:27)
 
@@ -32,7 +32,7 @@ SettlePerM2 <-function(group){
 
 
   ## convert coordinates to work with map ##
-  for (i in 1:length(typeNames)){
+  for (i in c(1,4)){
     #print(paste("Convertving Coordinates for", typeNames[i]))
     dfrs[[i]][,"horizPos1"]  = ifelse(dfrs[[i]][,"horizPos1"] > 0,dfrs[[i]][,"horizPos1"], 360-abs(dfrs[[i]][,"horizPos1"]))
     ## convert tracks
@@ -59,13 +59,13 @@ SettlePerM2 <-function(group){
 
   ## Find starters and settlers ##
 
-  settlers = dfrs[[5]]
+  settlers = dfrs[[4]]
   settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
   ## Pull out Settlers (C1M & C1F) from dfrs
-  settlers = settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),]
-  coordinates(settlers)=~horizPos1 + horizPos2
-  s = over(settlers, ConGrid1);s$Region[is.na(s$Region)] <- 999
+  settlers = as.data.frame(settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),])
+  sp::coordinates(settlers)=~horizPos1 + horizPos2
+  s = sp::over(settlers, ConGrid1);s$Region[is.na(s$Region)] <- 999
 
 
   RegionCode = data.frame(MapRegion = ConGrid1$Region, MapOrder = 1:27 )
@@ -134,7 +134,7 @@ SettlePerM2 <-function(group){
 
 
 
- windows(width = 12, height = 12);getBeringMap(addGrid=FALSE,addDepth=FALSE)
+getBeringMap(addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
  #mypal <- colorRampPalette(c("blue", "cyan", "yellow", "red", "darkred"))
  #mypal <- colorRampPalette(c("blue", "lightblue1", "lightpink", "red"))
@@ -143,7 +143,7 @@ SettlePerM2 <-function(group){
     ii = which(SettleInZone[,4]==i)
     c = SettleInZone$ColorCode[i]
     if(c<1){c=c+1}
-    plot(ConGrid1[ii,], col=rev(brewer.pal(9,"RdYlBu"))[c], add=TRUE)
+    raster::plot(ConGrid1[ii,], col=rev(RColorBrewer::brewer.pal(9,"RdYlBu"))[c], add=TRUE)
  }
 
 
@@ -153,7 +153,7 @@ SettlePerM2 <-function(group){
 
   legend(x = "bottomright", y = 1,
          legend = lgd_,
-         fill = brewer.pal(9,"RdYlBu"),
+         fill = RColorBrewer::brewer.pal(9,"RdYlBu"),
          border = NA,
          bty="n",
          title="Density (per m^2)
