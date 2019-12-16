@@ -8,6 +8,8 @@
 #'@return map showing connectivity between zones
 #'
 #'@export
+#'
+#'
 
 #require(RCurl)
 #require(diagram)
@@ -38,9 +40,6 @@ CMlist <- vector("list", 2)
     }
 
   }
-
-
-
 
 
   for (i in 1:length(ConGrid1)){
@@ -86,16 +85,16 @@ CMlist <- vector("list", 2)
   ## pull out starters from Z1 in dfrs
   starters = starters[!is.na(starters$horizPos1) & !is.na(starters$horizPos2),]
   sp::coordinates(starters)=~horizPos1 + horizPos2
-  s = rgeos::over(starters, ConGrid1); starters= cbind(data.frame(starters),s) ## match ResultsConn file to connectivity grid
+  s = sp::over(starters, ConGrid1); starters= cbind(data.frame(starters),s) ## match ResultsConn file to connectivity grid
 
   ## Get rid of starters that are on the fringe of sink regions
   h = table(starters$Region)
   starters = subset(starters,!(Region %in% as.numeric(names(which(h < max(h)* 0.16)))))
 
   ## Pull out Settlers (C1M & C1F) from dfrs
-  settlers = settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),]
+  settlers = as.data.frame(settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),])
   sp::coordinates(settlers)=~horizPos1 + horizPos2
-  s = rgeos::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
+  s = sp::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
   StartInRegion = data.frame(Region = 1:27, NumStarters = rep(NA, 27))
   for (i in 1:27){
@@ -162,10 +161,10 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
   }
 
 
-  CMap %<a-%{
+  #CMap %<a-%{
   ## Label Zones ##
 
-  windows(width = 12, height = 12);getBeringMap()
+  getBeringMap()
   lab = 1:27
   dd = c(200.05070, 196.80137, 193.84557, 192.25913, 191.10922, 197.80395, 195.25373, 191.68229, 189.12109, 187.36041, 195.03239, 193.23246, 189.45572, 186.0, 184.07891, 184.20322, 180.17429, 180.1170, 174.95373, 191.13708, 186.01163, 178.9745, 174.44257 , 182.2094, 177.50780, 174.65190, 194.98104)
   gg = c(57.50158,  58.07277,  59.20534,  60.28851,  61.68657,  56.14115,  56.82816,  57.87291,  59.05969,  60.88825,  54.95754,  55.63593,  56.56982,  58.0,  59.63626,  62.82903,  64.07788,  61.3,  61.52478,  54.65115,  56.19912,  60.0044,  60.83757,   55.0024,  57.65041,  59.49971,  53.94815)
@@ -206,9 +205,9 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
         }
       }
   }
-  }
+ # }
 
-  return(CMap)
+ # return(CMap)
 
 }
 
