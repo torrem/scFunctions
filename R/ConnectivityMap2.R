@@ -9,18 +9,19 @@
 #'
 #'@export
 
-require(RCurl)
-require(diagram)
+#require(RCurl)
+#require(diagram)
 
 # source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getStandardAttributes.R");
 # source("C:/Users/Mike/Documents/Snow Crab/SnowCrabFunctions/ResultsRead/getLifeStageInfo.SnowCrab.R");
 # source("https://raw.githubusercontent.com/torrem/scFunctions/master/BeringMap.R");
 
-info<-getLifeStageInfo.SnowCrab();
-typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
+
 
 ConnMap <-function(group){
 
+  info<-getLifeStageInfo.SnowCrab();
+  typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
 CMlist <- vector("list", 2)
 
