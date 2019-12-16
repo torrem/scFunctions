@@ -8,8 +8,8 @@
 #'
 #'@details none
 #'
+#'@export
 #'
-#'25
 getLifeStageInfo.SnowCrab<-function(resType='NEW2.0SC'){
 
     #get standard attributes dataframe

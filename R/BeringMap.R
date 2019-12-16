@@ -99,6 +99,6 @@ raster::plot(m2, add=TRUE, col='grey')
 
   if(addGrid==TRUE){plot(ConGrid1,add=TRUE)}
 
-#rm(ak,ConGrid1, m,envir = globalenv())
+rm(ak,ConGrid1, m,envir = globalenv())
 
 }

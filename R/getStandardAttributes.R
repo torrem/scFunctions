@@ -13,7 +13,7 @@
 #'  \code{"NEW2.0"}   for model results from DisMELS2.0\cr
 #'  \code{"OLD"}      for model results from (original) DisMELS\cr
 #'
-#'
+#'@export
 #'
 getStandardAttributes<-function(resType){
     if (toupper(resType)=='LATEST') resType<-'NEW2.0SC';
