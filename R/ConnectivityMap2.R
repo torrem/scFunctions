@@ -25,6 +25,8 @@ ConnMap <-function(group){
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
+  data(ConGrid1)
+
 CMlist <- vector("list", 2)
 
  for (kk in 1:length(group)){
