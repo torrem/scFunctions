@@ -74,7 +74,7 @@ SettledMap <-function(group, path, cl = 'red'){
   gg = c(57.50158,  58.07277,  59.20534,  60.28851,  61.68657,  56.14115,  56.82816,  57.87291,  59.05969,  60.88825,  54.95754,  55.63593,  56.56982,  58.0,  59.63626,  62.82903,  64.07788,  61.3,  61.52478,  54.65115,  56.19912,  60.0044,  60.83757,   55.0024,  57.65041,  59.49971,  53.94815)
   maptools::pointLabel(dd, gg,labels=paste(lab), cex=1.5, col="black")
   dev.off()
-
+  print(paste("making settled map for: ",names(group[kk])), sep="")
 
 
 }
