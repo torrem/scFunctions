@@ -33,9 +33,12 @@ SettlePerM2 <-function(group){
 
   ## convert coordinates to work with map ##
   for (i in c(1,4)){
-    #print(paste("Convertving Coordinates for", typeNames[i]))
-    dfrs[[i]][,"horizPos1"]  = ifelse(dfrs[[i]][,"horizPos1"] > 0,dfrs[[i]][,"horizPos1"], 360-abs(dfrs[[i]][,"horizPos1"]))
-    ## convert tracks
+    # print(paste("Convertving Coordinates for", typeNames[i]))
+    #dfrs[[]]
+    for (kkk in 1:nrow(dfrs[[i]])){
+      dfrs[[i]][kkk,"horizPos1"]  = ifelse(dfrs[[i]][kkk,"horizPos1"] > 0,dfrs[[i]][kkk,"horizPos1"], 360-abs(dfrs[[i]][kkk,"horizPos1"]))
+    }
+
   }
 
   for (i in 1:length(ConGrid1)){
