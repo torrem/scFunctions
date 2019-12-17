@@ -66,7 +66,7 @@ SettledMap <-function(group, path, cl = 'red'){
 
   png(paste(path,"/SettleMap_",names(group)[kk],".png",sep=""), width = 12, height = 12, units = "in", res = 200)
 
-  getBeringMap()
+  getBeringMap(openWindow=FALSE)
   points(settlers$horizPos2~settlers$horizPos1, cex=0.8, col=cl, pch=15)
   raster::plot(ConGrid1,add=TRUE)
   lab = 1:27
