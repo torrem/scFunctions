@@ -10,8 +10,7 @@
 #'@export
 #'
 #'
-require(ggplot2)
-require(dplyr)
+
 
 AvgTemp <-function(group1, group2, group3,
                    g1name ="Hindcast", g2name = "RCP4.5", g3name = "RCP8.5",
@@ -25,9 +24,9 @@ AvgTemp <-function(group1, group2, group3,
 
     Z1 = dfrs[[1]]
     Z2 = dfrs[[2]]
-    M = dfrs[[3]]
+    M = dfrs[[2]]
 
-    settlers = dfrs[[5]]
+    settlers = dfrs[[4]]
     settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
 
