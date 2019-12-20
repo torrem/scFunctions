@@ -36,7 +36,7 @@ SettledMap <-function(group, path, cl = 'red'){
       }
 
     }
-
+## Convert coordinates to fit on map ##
   for (i in 1:length(ConGrid1)){
 
     if (length(ConGrid1@polygons[[i]]@Polygons) ==1){

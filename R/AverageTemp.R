@@ -22,12 +22,12 @@ AvgTemp <-function(group1, group2, group3,
     resdr = group1[i]
     load(paste(resdr,"/dfrs.RData",sep=""))
 
-    Z1 = dfrs[[1]]
-    Z2 = dfrs[[2]]
-    M = dfrs[[2]]
+    Z1 = dfrs[[1]];    Z1=as.data.frame(subset(Z1, typeName=="Z1"))
+    Z2 = dfrs[[1]];Z2=as.data.frame(subset(Z2, typeName=="Z2"))
+    M = as.data.frame(dfrs[[2]])
 
     settlers = dfrs[[4]]
-    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
+    settlers = as.data.frame(settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]) ## makes sure only unique settlers are used
 
 
     for (kk in sample(settlers$origID,100, replace=TRUE)){
@@ -53,13 +53,12 @@ AvgTemp <-function(group1, group2, group3,
     resdr = group2[i]
     load(paste(resdr,"/dfrs.RData",sep=""))
 
-    Z1 = dfrs[[1]]
-    Z2 = dfrs[[2]]
-    M = dfrs[[3]]
+    Z1 = dfrs[[1]];    Z1=as.data.frame(subset(Z1, typeName=="Z1"))
+    Z2 = dfrs[[1]];Z2=as.data.frame(subset(Z2, typeName=="Z2"))
+    M = as.data.frame(dfrs[[2]])
 
-    settlers = dfrs[[5]]
-    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
-
+    settlers = dfrs[[4]]
+    settlers = as.data.frame(settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]) ## makes sure only unique settlers are used
 
     for (kk in sample(settlers$origID,100,replace=TRUE)){
 
@@ -87,13 +86,12 @@ AvgTemp <-function(group1, group2, group3,
     resdr = group3[i]
     load(paste(resdr,"/dfrs.RData",sep=""))
 
-    Z1 = dfrs[[1]]
-    Z2 = dfrs[[2]]
-    M = dfrs[[3]]
+    Z1 = dfrs[[1]];    Z1=as.data.frame(subset(Z1, typeName=="Z1"))
+    Z2 = dfrs[[1]];Z2=as.data.frame(subset(Z2, typeName=="Z2"))
+    M = as.data.frame(dfrs[[2]])
 
-    settlers = dfrs[[5]]
-    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
-
+    settlers = dfrs[[4]]
+    settlers = as.data.frame(settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]) ## makes sure only unique settlers are used
 
     for (kk in sample(settlers$origID,100,replace=TRUE)){
 
