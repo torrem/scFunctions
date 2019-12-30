@@ -21,7 +21,7 @@
 getBeringMap<-function(addGrid=TRUE, addDepth=TRUE, openWindow=TRUE){
 
   data(ak)
-  data(ConGrid1)
+  data(ConGridFinal)
   data(AlaskaLand)
 
   #repmis::source_data("https://github.com/torrem/scFunctions/blob/master/data/ConGrid.Rdata?raw=true")
