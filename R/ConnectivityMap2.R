@@ -213,13 +213,13 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
   ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
 
 
-  getBeringMap()
-  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
+  #getBeringMap()
+  #maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
 
   #CMap %<a-%{
   ## Label Zones ##
-
+#
 
 
   png(paste(path,"/ConnectivityMap_",substr(names(group)[kk], 1, 8),".png",sep=""), width = 12, height = 12, units = "in", res = 600)
@@ -232,7 +232,7 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 
   print("Making Connectivity Map...")
   ArrowCoords$Region = as.numeric( ArrowCoords$Region)
-  ArrowCoords = ArrowCoords[order(ArrowCoords$Region),]
+ # ArrowCoords = ArrowCoords[order(ArrowCoords$Region),]
 
   col <- colorRampPalette(c("Blue", "white","red"), bias=1)
   LW = 1:10
