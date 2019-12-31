@@ -222,7 +222,9 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 #
 
 
-png(paste(path,"/ConnectivityMap_",substr(names(group)[kk], 1, 8),".png",sep=""), width = 12, height = 12, units = "in", res = 600)
+png(paste(path,"/ConnectivityMap_",
+          substr(names(group)[1], 1, 8),"_",substr(names(group[1]), 10, 13),"-",substr(names(group[length(group)]), 10, 13),
+          ".png",sep=""), width = 12, height = 12, units = "in", res = 600)
   getBeringMap(openWindow=FALSE)
 
  # lab = 1:18
