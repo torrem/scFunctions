@@ -99,24 +99,6 @@ raster::plot(m2, add=TRUE, col='grey')
   if(addGrid==TRUE){raster::plot(ConGrid1,add=TRUE)}
 
 
-
-
-
-if(addLegend==TRUE){
-
-  zbreaks = c(20,50,100,150,round(seq(200, 8000, by=1500)))
-
-  c1 <- colorRampPalette(c("cyan","seagreen1","lightgoldenrod1","tan1"))
-  c2 <- colorRampPalette(c("blue3", "dodgerblue1"))
-
-  legend(x = 205, y = 56, legend = zbreaks, fill = c(rev(c1(4)), rev(c2(5))),
-         title = 'depth (m)', bg = "white",cex = 0.9)
-
-
-
-
-  }
-
 rm(ak,ConGrid1, m,envir = globalenv())
 
 }
