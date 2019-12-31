@@ -86,14 +86,13 @@ raster::plot(m2, add=TRUE, col='grey')
       ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
     }
 
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
-      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+      x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
       x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+      ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+    }
 
-      x = ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1] = x
     }
   }
 
