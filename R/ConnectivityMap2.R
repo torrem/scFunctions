@@ -20,7 +20,7 @@
 
 
 
-ConnMap <-function(group, path){
+ConnMap <-function(group, path, connThreshold = 15, connMax = 50, addLegend=TRUE, addDepthLegend=TRUE){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
@@ -213,8 +213,8 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
   ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
 
 
-  #getBeringMap()
-  #maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
+  getBeringMap()
+  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
 
   #CMap %<a-%{
@@ -222,16 +222,16 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 #
 
 
-  png(paste(path,"/ConnectivityMap_",substr(names(group)[kk], 1, 8),".png",sep=""), width = 12, height = 12, units = "in", res = 600)
-  getBeringMap(openWindow=FALSE)
+ # png(paste(path,"/ConnectivityMap_",substr(names(group)[kk], 1, 8),".png",sep=""), width = 12, height = 12, units = "in", res = 600)
+ # getBeringMap(openWindow=FALSE)
 
  # lab = 1:18
  # dd = c(200.05070, 196.80137, 193.84557, 192.25913, 191.10922, 197.80395, 195.25373, 191.68229, 189.12109, 187.36041, 195.03239, 193.23246, 189.45572, 186.0, 184.07891, 184.20322, 180.17429, 180.1170, 174.95373, 191.13708, 186.01163, 178.9745, 174.44257 , 182.2094, 177.50780, 174.65190, 194.98104)
  # gg = c(57.50158,  58.07277,  59.20534,  60.28851,  61.68657,  56.14115,  56.82816,  57.87291,  59.05969,  60.88825,  54.95754,  55.63593,  56.56982,  58.0,  59.63626,  62.82903,  64.07788,  61.3,  61.52478,  54.65115,  56.19912,  60.0044,  60.83757,   55.0024,  57.65041,  59.49971,  53.94815)
-  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
+  #maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
   print("Making Connectivity Map...")
-  ArrowCoords$Region = as.numeric( ArrowCoords$Region)
+ # ArrowCoords$Region = as.numeric( ArrowCoords$Region)
  # ArrowCoords = ArrowCoords[order(ArrowCoords$Region),]
 
   col <- colorRampPalette(c("Blue", "white","red"), bias=1)
@@ -241,13 +241,13 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 
     for (k in 1:nrow(ConnectMatrix))
 
-      if(ConnectMatrix[k,i] > 5){
+      if(ConnectMatrix[k,i] > connThreshold){
         #print(paste(k,i))
 
 
         if (i==k){
-          ValCol = ConnectMatrix[k,i]/35*100;if(ValCol>100){ValCol==100}
-          ValLWD = ConnectMatrix[k,i]/35*10;if(ValCol>10){ValCol==10}
+          ValCol = ConnectMatrix[k,i]/connMax*100;if(ValCol>100){ValCol=100}
+          ValLWD = ConnectMatrix[k,i]/connMax*10;if(ValLWD>10){ValLWD=10}
 
           diagram::curvedarrow(from = c(ArrowCoords[i,2], ArrowCoords[i,3]), to = c(ArrowCoords[i,2], ArrowCoords[i,3]) + c(0.8,0),
                                curve = -1, arr.pos = 1, arr.type="triangle",
@@ -257,16 +257,50 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
         }
 
         else{
-          ValCol = ConnectMatrix[k,i]/35*100;if(ValCol>100){ValCol==100}
-          ValLWD = ConnectMatrix[k,i]/35*10;if(ValCol>10){ValCol==10}
+          ValCol = (ConnectMatrix[k,i]/connMax)*100;if(ValCol>100){ValCol=100}
+          ValLWD = (ConnectMatrix[k,i]/connMax)*10;if(ValLWD>10){ValLWD=10}
 
           arrows(ArrowCoords[k,2], ArrowCoords[k,3], ArrowCoords[i,2], ArrowCoords[i,3],
                  col=col(100)[ValCol],
                  lwd = LW[ValLWD])
+          print(paste("k = ",k,";i=",i,
+                      ArrowCoords[k,2], ArrowCoords[k,3],
+                      ArrowCoords[i,2], ArrowCoords[i,3],
+                "ValLWD = ",ValLWD, sep=""))
         }
       }
   }
- # }
+
+
+  if(addLegend==TRUE){
+  lgd_ = rep(NA, 5)
+  lgd_[c(5,3,1)] = c(connThreshold, (connMax+connThreshold)/2    ,paste(">= ",connMax,sep=""))
+
+
+  legend(x = "topright", y = 1,
+         legend = lgd_,
+         lty = 1,
+         lwd = c(9, 7, 5, 3, 1),
+         col = c(rev(col(5))[1:2],rev(col(10))[6], rev(col(5))[4:5]   ),
+         bg = "white",
+         title="% Connectivity",
+         y.intersp = 0.5,
+         cex = 1.2, text.font = 0.7)
+  }
+
+  if(addDepthLegend==TRUE){
+
+    zbreaks = c(20,50,100,150,200,round(seq(400, 8000, by=1500)))
+
+    c1 <- colorRampPalette(c("cyan","seagreen1","lightgoldenrod1","tan1"))
+    c2 <- colorRampPalette(c("blue3", "dodgerblue1"))
+
+    legend(x = "bottomright", legend = zbreaks, fill = c(rev(c1(5)), rev(c2(6))),
+           title = 'depth (m)', bg = "white",cex = 1)
+
+}
+
+
 dev.off()
  # return(CMap)
 
