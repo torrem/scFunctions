@@ -25,7 +25,7 @@ ConnMap <-function(group, path){
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
-  data(ConGrid1)
+  data(ConGridFinal)
 
 CMlist <- vector("list", 2)
 
@@ -44,24 +44,47 @@ CMlist <- vector("list", 2)
   }
 
 
+  # for (i in 1:length(ConGrid1)){
+  #
+  #   if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+  #     dd = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+  #     dd = ifelse(dd > 0,dd, 360-abs(dd) )
+  #     ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = dd
+  #   }
+  #
+  #   if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
+  #     dd = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+  #     dd = ifelse(dd > 0,dd, 360-abs(dd) )
+  #     ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = dd
+  #
+  #     dd = ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1]
+  #     dd = ifelse(dd > 0,dd, 360-abs(dd) )
+  #     ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1] = dd
+  #   }
+  # }
+
+
   for (i in 1:length(ConGrid1)){
 
     if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
-      dd = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-      dd = ifelse(dd > 0,dd, 360-abs(dd) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = dd
+      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+      x = ifelse(x > 0,x, 360-abs(x) )
+      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
     }
 
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
-      dd = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-      dd = ifelse(dd > 0,dd, 360-abs(dd) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = dd
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+      }
 
-      dd = ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1]
-      dd = ifelse(dd > 0,dd, 360-abs(dd) )
-      ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1] = dd
     }
   }
+
+
+
+
 
   ## Find starters and settlers ##
   starters = as.data.frame(dfrs[[1]])
@@ -87,28 +110,30 @@ CMlist <- vector("list", 2)
   ## pull out starters from Z1 in dfrs
   starters = starters[!is.na(starters$horizPos1) & !is.na(starters$horizPos2),]
   sp::coordinates(starters)=~horizPos1 + horizPos2
+  sp::proj4string(starters) <- sp::proj4string(ConGrid1)
   s = sp::over(starters, ConGrid1); starters= cbind(data.frame(starters),s) ## match ResultsConn file to connectivity grid
 
   ## Get rid of starters that are on the fringe of sink regions
-  h = table(starters$Region)
-  starters = subset(starters,!(Region %in% as.numeric(names(which(h < max(h)* 0.16)))))
+  h = table(starters$OBJECTID)
+  starters = subset(starters,!(OBJECTID %in% as.numeric(names(which(h < max(h)* 0.16)))))
 
   ## Pull out Settlers (C1M & C1F) from dfrs
   settlers = as.data.frame(settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),])
   sp::coordinates(settlers)=~horizPos1 + horizPos2
+  sp::proj4string(settlers) <- sp::proj4string(ConGrid1)
   s = sp::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
-  StartInRegion = data.frame(Region = 1:27, NumStarters = rep(NA, 27))
-  for (i in 1:27){
-    d = nrow(subset(starters, Region==i))
+  StartInRegion = data.frame(OBJECTID = 1:18, NumStarters = rep(NA, 18))
+  for (i in 1:18){
+    d = nrow(subset(starters, OBJECTID==i))
     StartInRegion[i,2] = d
   }
 
-  ConnectMatrix = matrix(nrow=27, ncol = 27, dimnames=list(c(1:27),c(1:27)))
+  ConnectMatrix = matrix(nrow=18, ncol = 18, dimnames=list(c(1:18),c(1:18)))
 
-  for (i in 1:27){
-    dd = subset(settlers, Region==i)
-    gg = as.data.frame(table(starters[dd$origID,]$Region))
+  for (i in 1:18){
+    dd = subset(settlers, OBJECTID==i)
+    gg = as.data.frame(table(starters[dd$origID,]$OBJECTID))
 
    # print(nrow(dd))
     if (nrow(dd) > 0){
@@ -138,8 +163,8 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 
 
 
-  ArrowCoords = data.frame(Region=ConGrid1@data$Region,dd = rep(NA, length(ConGrid1@data$Region)),
-                           gg = rep(NA, length(ConGrid1@data$Region)))
+  ArrowCoords = data.frame(Region=ConGrid1@data$OBJECTID,dd = rep(NA, length(ConGrid1@data$OBJECTID)),
+                           gg = rep(NA, length(ConGrid1@data$OBJECTID)))
 
   for (i in 1:length(ConGrid1)){
 
@@ -150,17 +175,46 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
       ArrowCoords[i,3] = dd[2]
     }
 
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
-      dd = ConGrid1@polygons[[i]]@Polygons[[1]]@labpt
-      dd[1] = ifelse(dd[1] > 0,dd[1], 360-abs(dd[1]) )
-      dd2 = ConGrid1@polygons[[i]]@Polygons[[2]]@labpt
-      dd2[1] = ifelse(dd2[1] > 0,dd2[1], 360-abs(dd2[1]) )
-      dd = c(mean(c(dd[1], dd2[1])), mean(c(dd[2], dd2[2])))
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+
+      polylist = data.frame(poly = 1:length(ConGrid1@polygons[[i]]@Polygons),
+                            area = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                            dd = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                            gg = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)))
+
+
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+
+      polylist[gh,]$area = ConGrid1@polygons[[i]]@Polygons[[gh]]@area
+
+      polylist[gh,]$dd = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[1]
+      polylist[gh,]$dd = ifelse(polylist[gh,]$dd > 0,polylist[gh,]$dd, 360-abs(polylist[gh,]$dd))
+
+      polylist[gh,]$gg = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[2]
+
+      }
+
+      polylist <- polylist[order(-polylist$area),]
+
+      dd = c(mean(c(polylist[1,]$dd, polylist[2,]$dd)), mean(c(polylist[1,]$gg, polylist[2,]$gg)))
       ArrowCoords[i,2] = dd[1]
       ArrowCoords[i,3] = dd[2]
 
+
+
     }
   }
+
+  ArrowCoords[1,2]=181.5;ArrowCoords[1,3]=60.5
+  ArrowCoords[7,2]=188.3;ArrowCoords[7,3]=56.5
+  ArrowCoords[12,2]=198.8;ArrowCoords[12,3]=57.4
+  ArrowCoords[13,2]=195;ArrowCoords[13,3]=58.7
+  ArrowCoords[14,2]=191.3;ArrowCoords[14,3]=59.3
+  ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
+
+
+  getBeringMap()
+  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
 
   #CMap %<a-%{
@@ -171,12 +225,13 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
   png(paste(path,"/ConnectivityMap_",substr(names(group)[kk], 1, 8),".png",sep=""), width = 12, height = 12, units = "in", res = 600)
   getBeringMap(openWindow=FALSE)
 
-  lab = 1:27
-  dd = c(200.05070, 196.80137, 193.84557, 192.25913, 191.10922, 197.80395, 195.25373, 191.68229, 189.12109, 187.36041, 195.03239, 193.23246, 189.45572, 186.0, 184.07891, 184.20322, 180.17429, 180.1170, 174.95373, 191.13708, 186.01163, 178.9745, 174.44257 , 182.2094, 177.50780, 174.65190, 194.98104)
-  gg = c(57.50158,  58.07277,  59.20534,  60.28851,  61.68657,  56.14115,  56.82816,  57.87291,  59.05969,  60.88825,  54.95754,  55.63593,  56.56982,  58.0,  59.63626,  62.82903,  64.07788,  61.3,  61.52478,  54.65115,  56.19912,  60.0044,  60.83757,   55.0024,  57.65041,  59.49971,  53.94815)
-  maptools::pointLabel(dd, gg,labels=paste(lab), cex=1.5, col="black")
+ # lab = 1:18
+ # dd = c(200.05070, 196.80137, 193.84557, 192.25913, 191.10922, 197.80395, 195.25373, 191.68229, 189.12109, 187.36041, 195.03239, 193.23246, 189.45572, 186.0, 184.07891, 184.20322, 180.17429, 180.1170, 174.95373, 191.13708, 186.01163, 178.9745, 174.44257 , 182.2094, 177.50780, 174.65190, 194.98104)
+ # gg = c(57.50158,  58.07277,  59.20534,  60.28851,  61.68657,  56.14115,  56.82816,  57.87291,  59.05969,  60.88825,  54.95754,  55.63593,  56.56982,  58.0,  59.63626,  62.82903,  64.07788,  61.3,  61.52478,  54.65115,  56.19912,  60.0044,  60.83757,   55.0024,  57.65041,  59.49971,  53.94815)
+  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
   print("Making Connectivity Map...")
+  ArrowCoords$Region = as.numeric( ArrowCoords$Region)
   ArrowCoords = ArrowCoords[order(ArrowCoords$Region),]
 
   col <- colorRampPalette(c("Blue", "white","red"), bias=1)
