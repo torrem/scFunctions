@@ -230,8 +230,11 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
  #
 
 
+  FT = ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD")
+
   ## hindcast names##
   if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/ConnMap_",
+                                                           ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
                                                            strsplit(names(group[1]),'_')[[1]][1],"_",
                                                            strsplit(names(group[1]),'_')[[1]][2],"-",
                                                            strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
@@ -241,6 +244,7 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 
   ## forecast names##
   if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/ConnMap_",
+                                                           ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
                                                            strsplit(names(group[1]),'_')[[1]][1],"_",
                                                            strsplit(names(group[1]),'_')[[1]][2],"_",
                                                            strsplit(names(group[1]),'_')[[1]][3],"-",
