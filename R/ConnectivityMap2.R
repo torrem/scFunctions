@@ -222,9 +222,37 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 #
 
 
-png(paste(path,"/ConnectivityMap_",
-          substr(names(group)[1], 1, 8),"_",substr(names(group[1]), 10, 13),"-",substr(names(group[length(group)]), 10, 13),
-          ".png",sep=""), width = 12, height = 12, units = "in", res = 600)
+
+  str = strsplit(names(group[1]), '_')[[1]]
+
+
+
+ #
+
+
+  ## hindcast names##
+  if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/ConnMap_",
+                                                           strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                           strsplit(names(group[1]),'_')[[1]][2],"-",
+                                                           strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
+                                                           , width = 12, height = 12, units = "in", res = 600)
+
+    }
+
+  ## forecast names##
+  if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/ConnMap_",
+                                                           strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                           strsplit(names(group[1]),'_')[[1]][2],"_",
+                                                           strsplit(names(group[1]),'_')[[1]][3],"-",
+                                                           strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
+                                                           , width = 12, height = 12, units = "in", res = 600)
+
+    }
+
+
+
+
+
   getBeringMap(openWindow=FALSE)
 
  # lab = 1:18
@@ -307,5 +335,8 @@ dev.off()
  # return(CMap)
 
 }
+
+
+#
 
 ### need to standardize arrow scale
