@@ -230,7 +230,6 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
  #
 
 
-  FT = ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD")
 
   ## hindcast names##
   if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/ConnMap_",
