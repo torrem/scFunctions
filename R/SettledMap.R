@@ -22,7 +22,7 @@ SettledMap <-function(group, path, cl = 'red'){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
-  data(ConGrid1)
+  data(ConGridFinal)
 
   for (kk in 1:length(group)){
   load(paste(group[kk],"/dfrs.RData",sep=""))
@@ -37,42 +37,111 @@ SettledMap <-function(group, path, cl = 'red'){
 
     }
 ## Convert coordinates to fit on map ##
-  for (i in 1:length(ConGrid1)){
+    for (i in 1:length(ConGrid1)){
 
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
-      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+      if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+        x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+      }
+
+      if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+        for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+          x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+          x = ifelse(x > 0,x, 360-abs(x) )
+          ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+        }
+
+      }
     }
-
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
-      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
-
-      x = ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1] = x
-    }
-  }
 
   ## Find settlers ##
-  settlers = dfrs[[4]]
-  settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
+     settlers = dfrs[[4]]
+    #settlers = settlers[!duplicated(settlers$origID), ]
+    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
+
+
+    ## get coords for labels ##
+    ArrowCoords = data.frame(Region=ConGrid1@data$OBJECTID,dd = rep(NA, length(ConGrid1@data$OBJECTID)),
+                             gg = rep(NA, length(ConGrid1@data$OBJECTID)))
+
+    for (i in 1:length(ConGrid1)){
+
+      if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+        dd = ConGrid1@polygons[[i]]@Polygons[[1]]@labpt
+        dd[1] = ifelse(dd[1] > 0,dd[1], 360-abs(dd[1]) )
+        ArrowCoords[i,2] = dd[1]
+        ArrowCoords[i,3] = dd[2]
+      }
+
+      if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+
+        polylist = data.frame(poly = 1:length(ConGrid1@polygons[[i]]@Polygons),
+                              area = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                              dd = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                              gg = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)))
+
+
+        for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+
+          polylist[gh,]$area = ConGrid1@polygons[[i]]@Polygons[[gh]]@area
+
+          polylist[gh,]$dd = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[1]
+          polylist[gh,]$dd = ifelse(polylist[gh,]$dd > 0,polylist[gh,]$dd, 360-abs(polylist[gh,]$dd))
+
+          polylist[gh,]$gg = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[2]
+
+        }
+
+        polylist <- polylist[order(-polylist$area),]
+
+        dd = c(mean(c(polylist[1,]$dd, polylist[2,]$dd)), mean(c(polylist[1,]$gg, polylist[2,]$gg)))
+        ArrowCoords[i,2] = dd[1]
+        ArrowCoords[i,3] = dd[2]
+
+
+
+      }
+    }
+
+    ArrowCoords[1,2]=181.5;ArrowCoords[1,3]=60.5
+    ArrowCoords[7,2]=188.3;ArrowCoords[7,3]=56.5
+    ArrowCoords[12,2]=198.8;ArrowCoords[12,3]=57.4
+    ArrowCoords[13,2]=195;ArrowCoords[13,3]=58.7
+    ArrowCoords[14,2]=191.3;ArrowCoords[14,3]=59.3
+    ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
+
 
 
 
   ## plot starters and settlers
 
-  png(paste(path,"/SettleMap_",names(group)[kk],".png",sep=""), width = 12, height = 12, units = "in", res = 200)
+    ## hindcast names##
+    if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/SettleMap_",
+                                                                   ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                   strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                                   strsplit(names(group[1]),'_')[[1]][2],"-",
+                                                                   strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
+                                                             , width = 12, height = 12, units = "in", res = 600)
+
+    }
+
+    ## forecast names##
+    if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/SettleMap_",
+                                                                   ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                   strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                                   strsplit(names(group[1]),'_')[[1]][2],"_",
+                                                                   strsplit(names(group[1]),'_')[[1]][3],"-",
+                                                                   strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
+                                                             , width = 12, height = 12, units = "in", res = 600)
+
+    }
 
   getBeringMap(openWindow=FALSE)
+  #getBeringMap()
   points(settlers$horizPos2~settlers$horizPos1, cex=0.8, col=cl, pch=15)
   raster::plot(ConGrid1,add=TRUE)
-  lab = 1:27
-  dd = c(200.05070, 196.80137, 193.84557, 192.25913, 191.10922, 197.80395, 195.25373, 191.68229, 189.12109, 187.36041, 195.03239, 193.23246, 189.45572, 186.0, 184.07891, 184.20322, 180.17429, 180.1170, 174.95373, 191.13708, 186.01163, 178.9745, 174.44257 , 182.2094, 177.50780, 174.65190, 194.98104)
-  gg = c(57.50158,  58.07277,  59.20534,  60.28851,  61.68657,  56.14115,  56.82816,  57.87291,  59.05969,  60.88825,  54.95754,  55.63593,  56.56982,  58.0,  59.63626,  62.82903,  64.07788,  61.3,  61.52478,  54.65115,  56.19912,  60.0044,  60.83757,   55.0024,  57.65041,  59.49971,  53.94815)
-  maptools::pointLabel(dd, gg,labels=paste(lab), cex=1.5, col="black")
+  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
   dev.off()
   print(paste("making settled map for: ",names(group[kk])), sep="")
 
