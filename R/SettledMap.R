@@ -120,19 +120,17 @@ SettledMap <-function(group, path, cl = 'red'){
     if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/SettleMap_",
                                                                    ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
                                                                    strsplit(names(group[1]),'_')[[1]][1],"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][2],"-",
-                                                                   strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
+                                                                   strsplit(names(group[1]),'_')[[1]][2],".png",sep="")
                                                              , width = 12, height = 12, units = "in", res = 600)
 
     }
 
     ## forecast names##
     if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/SettleMap_",
-                                                                   ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][1],"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][2],"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][3],"-",
-                                                                   strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
+                                                                         ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                         strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                                         strsplit(names(group[1]),'_')[[1]][2],"_",
+                                                                         strsplit(names(group[1]),'_')[[1]][3],".png",sep="")
                                                              , width = 12, height = 12, units = "in", res = 600)
 
     }
