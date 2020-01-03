@@ -120,41 +120,6 @@ SettledMap <-function(group, path, cl = 'red'){
 
 
 
-
-
-
-    ## hindcast names##
-    if(length(strsplit(names(group[1]), '_')[[1]])==2){paste("/SettleMap_",
-                                                                   ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][1],"_",
-                                                                   strsplit(names(group[kk]),'_')[[1]][2],".png",sep="")
-
-    }
-
-    ## forecast names##
-    if(length(strsplit(names(group[1]), '_')[[1]])>2){paste("/SettleMap_",
-                                                                   ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][1],"_",
-                                                                   strsplit(names(group[1]),'_')[[1]][2],"_",
-                                                                   strsplit(names(group[kk]),'_')[[1]][3],".png",sep="")
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     ## hindcast names##
     if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/SettleMap_",
                                                                    ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
