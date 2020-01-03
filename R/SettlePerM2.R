@@ -22,7 +22,7 @@ SettlePerM2 <-function(group){
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
-  data(ConGrid1)
+
 
   SIZ = data.frame(Region = 1:27)
 
@@ -30,7 +30,7 @@ SettlePerM2 <-function(group){
   resdr = group[kk]
   load(paste(resdr,"/dfrs.RData",sep=""))
 
-
+  data(ConGrid1)
   ## convert coordinates to work with map ##
   for (i in c(1,4)){
     # print(paste("Convertving Coordinates for", typeNames[i]))
