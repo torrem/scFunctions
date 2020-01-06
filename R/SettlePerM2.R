@@ -17,20 +17,20 @@
 
 
 
-SettlePerM2 <-function(group){
+SettlePerM2 <-function(group, path){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
 
 
 
-  SIZ = data.frame(Region = 1:27)
+  SIZ = data.frame(Region = 1:18)
 
   for (kk in 1:length(group)){
   resdr = group[kk]
   load(paste(resdr,"/dfrs.RData",sep=""))
 
-  data(ConGrid1)
+  data(ConGridFinal)
   ## convert coordinates to work with map ##
   for (i in c(1,4)){
     # print(paste("Convertving Coordinates for", typeNames[i]))
@@ -49,29 +49,37 @@ SettlePerM2 <-function(group){
       ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
     }
 
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==2) {
-      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+      }
 
-      x = ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[2]]@coords[,1] = x
     }
   }
+
 
   ## Find starters and settlers ##
 
   settlers = dfrs[[4]]
+  #settlers = settlers[!duplicated(settlers$origID), ]
   settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
+
+
+
+  ## Connectivity Matrix ##
+
+
 
   ## Pull out Settlers (C1M & C1F) from dfrs
   settlers = as.data.frame(settlers[!is.na(settlers$horizPos1) & !is.na(settlers$horizPos2),])
   sp::coordinates(settlers)=~horizPos1 + horizPos2
-  s = sp::over(settlers, ConGrid1);s$Region[is.na(s$Region)] <- 999
+  sp::proj4string(settlers) <- sp::proj4string(ConGrid1)
+  s = sp::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
 
-  RegionCode = data.frame(MapRegion = ConGrid1$Region, MapOrder = 1:27 )
+  RegionCode = data.frame(MapRegion = ConGrid1$OBJECTID, MapOrder = 1:18 )
 
   ##change congrid1 region code to connectivity zone code on my map ##
   # for (i in 1:15){
@@ -81,32 +89,42 @@ SettlePerM2 <-function(group){
   # }
 
 
-  settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
 
 
-  SettleInZone = data.frame(Region = 1:27, NumSettlers = rep(NA, 27))
+  SettleInZone = data.frame(Region = 1:18, NumSettlers = rep(NA, 18))
 
 
 
 
 
-  ZoneArea = c(45467923122.099998,48733983826.099998,41876641917.599998,29150756998.799999,50041280842.699997,28156982144.700001,
-               48463658481.400002,32175199970.5,     43058333151.599998,51965675314.099998,4310824373.58,
-               36272213040.599998,43645241013.099998,31182972193.700001,46377460312.400002,73897745180.199997,
-               65750246504.099998,67469098918.199997,24266122353.799999,67796246840.199997,28853274483.599998,
-               42299337357.599998,22181812802.799999,261250592356,156851996233,104870483607,29208450343.400002)
+  # ZoneArea = c(45467923122.099998,48733983826.099998,41876641917.599998,29150756998.799999,50041280842.699997,28156982144.700001,
+  #              48463658481.400002,32175199970.5,     43058333151.599998,51965675314.099998,4310824373.58,
+  #              36272213040.599998,43645241013.099998,31182972193.700001,46377460312.400002,73897745180.199997,
+  #              65750246504.099998,67469098918.199997,24266122353.799999,67796246840.199997,28853274483.599998,
+  #              42299337357.599998,22181812802.799999,261250592356,156851996233,104870483607,29208450343.400002)
+
+
+
+  ZoneArea = c(35911676627.099998, 39408149960.300003, 46956045354.300003, 41094685962.199997, 34211330674.599998,
+               45881540952.5, 22208137040.200001, 57357157291.800003, 136700470037, 1293071211090, 103302772116, 68298378731.5,
+               54178280831.699997, 48773932053.699997, 62250352285.099998, 129268973061, 49039954043.099998, 44736019789.099998)
+
+
+
+
+
 
   SettleInZone = cbind(SettleInZone,ZoneArea)
 
 
  # SettleInZone$Region = RegionCode$MapRegion
 
-  SettleInZone$R2 = RegionCode$MapRegion
+ # SettleInZone$R2 = RegionCode$MapRegion
   #SettleInZone <- SettleInZone[order(SettleInZone$R2),]
 
-    for (i in 1:27){
-      x = nrow(subset(settlers, Region==i))
+    for (i in 1:18){
+      x = nrow(subset(settlers, OBJECTID==i))
       SettleInZone[i,2] = x
     }
 
@@ -124,8 +142,8 @@ SettlePerM2 <-function(group){
 
   SettleInZone$Density = SIZ$Mean
 
-  SettleInZone$ColorCode = ifelse(round((SettleInZone$Density/max(SettleInZone$Density))*9)>9,
-                                  9,round((SettleInZone$Density/max(SettleInZone$Density))*9) )
+  SettleInZone$ColorCode = ifelse(round((SettleInZone$Density/max(SettleInZone$Density))*100)>100,
+                                  100,round((SettleInZone$Density/max(SettleInZone$Density))*100) )
 
 
 
@@ -137,21 +155,57 @@ SettlePerM2 <-function(group){
 
 
 
+  ## hindcast names##
+  if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/SettlePerM2Map",
+                                                                 ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                 strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                                 strsplit(names(group[1]),'_')[[1]][2],"-",
+                                                                 strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
+                                                           , width = 12, height = 12, units = "in", res = 600)
+
+  }
+
+  ## forecast names##
+  if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/SettlePerM2Map",
+                                                                 ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                 strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                                 strsplit(names(group[1]),'_')[[1]][2],"_",
+                                                                 strsplit(names(group[1]),'_')[[1]][3],"-",
+                                                                 strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
+                                                           , width = 12, height = 12, units = "in", res = 600)
+
+  }
+
+
+
+
+
+
+
+
+
 getBeringMap(addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
- #mypal <- colorRampPalette(c("blue", "cyan", "yellow", "red", "darkred"))
+ cc = rev(RColorBrewer::brewer.pal(9,"RdYlBu"))
+ mypal <- colorRampPalette(c(cc[1], cc[2], cc[3], cc[4], cc[5], cc[6], cc[7], cc[8], cc[9]))
  #mypal <- colorRampPalette(c("blue", "lightblue1", "lightpink", "red"))
- for (i in 1:27){
+ for (i in 1:18){
 
-    ii = which(SettleInZone[,4]==i)
+    #ii = which(SettleInZone[,4]==i)
     c = SettleInZone$ColorCode[i]
     if(c<1){c=c+1}
-    raster::plot(ConGrid1[ii,], col=rev(RColorBrewer::brewer.pal(9,"RdYlBu"))[c], add=TRUE)
+    raster::plot(ConGrid1[i,], col=mypal(100)[c], add=TRUE)
+    #raster::plot(ConGrid1[i,], col=cc[3], add=TRUE)
  }
 
 
   lgd_ = rep(NA, 9)
-  lgd_[c(1,5,9)] = c("1 x 10^-8","5 x 10^-9",0)
+
+  #maxden = formatC(max(SettleInZone$Density), format = "e", digits=2 )
+
+  lgd_[c(1,5,9)] = c(formatC(max(SettleInZone$Density), format = "e", digits=2 ),
+                     formatC(mean(SettleInZone$Density), format = "e", digits=2 ),
+                     0)
 
 
   legend(x = "bottomright", y = 1,
@@ -168,7 +222,7 @@ getBeringMap(addGrid=FALSE,addDepth=FALSE)
 
 
   #return(SettleInZone[,1:4])
-
+dev.off()
 
 }
 
