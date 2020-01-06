@@ -108,7 +108,7 @@ raster::plot(m2, add=TRUE, col='grey')
 
 ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
 
-  if(addGrid==TRUE){raster::plot(ConGrid1, lwd=1.5,add=TRUE)}
+  if(addGrid==TRUE){raster::plot(ConGrid1, lwd=2,add=TRUE)}
 
 
 rm(ak, m,envir = globalenv())
