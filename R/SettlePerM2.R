@@ -60,6 +60,63 @@ SettlePerM2 <-function(group, path){
   }
 
 
+
+  ArrowCoords = data.frame(Region=ConGrid1@data$OBJECTID,dd = rep(NA, length(ConGrid1@data$OBJECTID)),
+                           gg = rep(NA, length(ConGrid1@data$OBJECTID)))
+
+  for (i in 1:length(ConGrid1)){
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+      dd = ConGrid1@polygons[[i]]@Polygons[[1]]@labpt
+      dd[1] = ifelse(dd[1] > 0,dd[1], 360-abs(dd[1]) )
+      ArrowCoords[i,2] = dd[1]
+      ArrowCoords[i,3] = dd[2]
+    }
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+
+      polylist = data.frame(poly = 1:length(ConGrid1@polygons[[i]]@Polygons),
+                            area = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                            dd = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                            gg = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)))
+
+
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+
+        polylist[gh,]$area = ConGrid1@polygons[[i]]@Polygons[[gh]]@area
+
+        polylist[gh,]$dd = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[1]
+        polylist[gh,]$dd = ifelse(polylist[gh,]$dd > 0,polylist[gh,]$dd, 360-abs(polylist[gh,]$dd))
+
+        polylist[gh,]$gg = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[2]
+
+      }
+
+      polylist <- polylist[order(-polylist$area),]
+
+      dd = c(mean(c(polylist[1,]$dd, polylist[2,]$dd)), mean(c(polylist[1,]$gg, polylist[2,]$gg)))
+      ArrowCoords[i,2] = dd[1]
+      ArrowCoords[i,3] = dd[2]
+
+
+
+    }
+  }
+
+  ArrowCoords[1,2]=181.5;ArrowCoords[1,3]=60.5
+  ArrowCoords[7,2]=188.3;ArrowCoords[7,3]=56.5
+  ArrowCoords[12,2]=198.8;ArrowCoords[12,3]=57.4
+  ArrowCoords[13,2]=195;ArrowCoords[13,3]=58.7
+  ArrowCoords[14,2]=191.3;ArrowCoords[14,3]=59.3
+  ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
+
+
+
+
+
+
+
+
   ## Find starters and settlers ##
 
   settlers = dfrs[[4]]
@@ -112,7 +169,7 @@ SettlePerM2 <-function(group, path){
 
 
 
-
+  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
 
   SettleInZone = cbind(SettleInZone,ZoneArea)
