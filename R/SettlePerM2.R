@@ -169,7 +169,7 @@ SettlePerM2 <-function(group, path){
 
 
 
-  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
+
 
 
   SettleInZone = cbind(SettleInZone,ZoneArea)
@@ -276,7 +276,7 @@ getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
          cex = 1.5, text.font = 2)
 
 
-
+  maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
 
   #return(SettleInZone[,1:4])
 dev.off()
