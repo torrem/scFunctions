@@ -184,7 +184,7 @@ SettlePerM2 <-function(group, path){
 
 
 
-getBeringMap(addGrid=FALSE,addDepth=FALSE)
+getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
  cc = rev(RColorBrewer::brewer.pal(9,"RdYlBu"))
  mypal <- colorRampPalette(c(cc[1], cc[2], cc[3], cc[4], cc[5], cc[6], cc[7], cc[8], cc[9]))
