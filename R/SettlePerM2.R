@@ -237,7 +237,7 @@ SettlePerM2 <-function(group, path){
 
 
 
-
+  ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
 
 
 
@@ -251,7 +251,7 @@ getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
     #ii = which(SettleInZone[,4]==i)
     c = SettleInZone$ColorCode[i]
     if(c<1){c=c+1}
-    raster::plot(ConGrid1[i,], col=mypal(100)[c], add=TRUE)
+    raster::plot(ConGrid1[i,], lwd=2, col=mypal(100)[c], add=TRUE)
     #raster::plot(ConGrid1[i,], col=cc[3], add=TRUE)
  }
 
