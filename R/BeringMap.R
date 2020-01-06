@@ -96,7 +96,25 @@ raster::plot(m2, add=TRUE, col='grey')
     }
   }
 
-  if(addGrid==TRUE){raster::plot(ConGrid1,add=TRUE)}
+#shape2 <- aggregate(ConGrid1,dissolve=T)
+
+# install.packages("gpclib")
+# library("gpclib")
+# gpclibPermit()
+# [1] TRUE
+# Warning message:
+# In gpclibPermit() :
+#  support for gpclib will be withdrawn from maptools at the next major release
+
+ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
+
+
+
+plot(ConGrid1[10,])
+
+summarise(ConGrid1[10,])
+
+  if(addGrid==TRUE){raster::plot(ConGrid1, lwd=1.5,add=TRUE)}
 
 
 rm(ak, m,envir = globalenv())
