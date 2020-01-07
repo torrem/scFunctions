@@ -13,7 +13,7 @@
 #'
 
 
-IMDHist <-function(group, path, col='cyan',){
+IMDHist <-function(group, path, col='cyan'){
 
 FreqTable = data.frame(typeName=character(), ageInStage=numeric() )
 
