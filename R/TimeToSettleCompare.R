@@ -10,6 +10,7 @@
 #'@export
 #'
 #'
+#'
 require(ggplot2)
 
 SettleMonthC <-function(group1, group2, group3,
@@ -35,6 +36,23 @@ for (i in 1:length(group1)){
   colnames(FreqTableX)[i+1] = paste(names(group1)[i])
 }
 FreqTableX$mean = apply(FreqTableX[,c(seq(2,length(group1)+1,by=1))],1, mean)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##
 FreqTableY = data.frame(Breaks = seq(1,12,by=1))
