@@ -13,7 +13,7 @@
 #'
 
 
-IMDHist <-function(group, path, col='cyan'){
+IMDHist <-function(group, path){
 
 FreqTable = data.frame(typeName=character(), ageInStage=numeric() )
 
@@ -39,8 +39,8 @@ if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/IMDHist_",
                                                                ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
                                                                strsplit(names(group[1]),'_')[[1]][1],"_",
                                                                strsplit(names(group[1]),'_')[[1]][2],"-",
-                                                               strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
-                                                         , width = 12, height = 8, units = "in", res = 300)
+                                                               strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep=""))
+   #                                                      , width = 12, height = 8, units = "in", res = 600)
 
 }
 
@@ -50,17 +50,48 @@ if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/IMDHist_",
                                                                strsplit(names(group[1]),'_')[[1]][1],"_",
                                                                strsplit(names(group[1]),'_')[[1]][2],"_",
                                                                strsplit(names(group[1]),'_')[[1]][3],"-",
-                                                               strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
-                                                         , width = 12, height = 8, units = "in", res = 300)
+                                                               strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep=""))
+#                                                         , width = 12, height = 8, units = "in", res = 600)
 
 }
 
 
 
-lattice::histogram(~ ageInStage | typeName, data = FreqTable,
+
+
+
+
+
+if(length(strsplit(names(group[1]), '_')[[1]])==2){png( paste(path,"/IMDHist_",
+                                                               ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                               strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                               strsplit(names(group[1]),'_')[[1]][2],"-",
+                                                               strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
+                                                       ,width = 12, height = 8, units = "in", res = 300)
+
+}
+
+## forecast names##
+if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/IMDHist_",
+                                                               ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                               strsplit(names(group[1]),'_')[[1]][1],"_",
+                                                               strsplit(names(group[1]),'_')[[1]][2],"_",
+                                                               strsplit(names(group[1]),'_')[[1]][3],"-",
+                                                               strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep=""))
+                                                           , width = 12, height = 8, units = "in", res = 300)
+
+}
+
+
+
+
+
+
+
+g = lattice::histogram(~ ageInStage | typeName, data = FreqTable,
                    layout = c(3, 1), scales=list(alternating=FALSE))
 
-
+print(g)
 
 
 dev.off()
