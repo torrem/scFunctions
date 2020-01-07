@@ -31,8 +31,8 @@ for (kk in 1:length(group)){
   print(paste("calculating IMD for: ",names(group[kk])), sep="")
 
 }
-
-
+FreqTable$typeName =  as.factor(FreqTable$typeName)
+levels(FreqTable$typeName) <- c("Z1", "Z2", "M")
 
 ## hindcast names##
 if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/IMDHist_",
@@ -40,7 +40,7 @@ if(length(strsplit(names(group[1]), '_')[[1]])==2){png(  paste(path,"/IMDHist_",
                                                                strsplit(names(group[1]),'_')[[1]][1],"_",
                                                                strsplit(names(group[1]),'_')[[1]][2],"-",
                                                                strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
-                                                         , width = 12, height = 8, units = "in", res = 200)
+                                                         , width = 12, height = 8, units = "in", res = 300)
 
 }
 
@@ -51,10 +51,9 @@ if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/IMDHist_",
                                                                strsplit(names(group[1]),'_')[[1]][2],"_",
                                                                strsplit(names(group[1]),'_')[[1]][3],"-",
                                                                strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
-                                                         , width = 12, height = 8, units = "in", res = 200)
+                                                         , width = 12, height = 8, units = "in", res = 300)
 
 }
-
 
 
 
