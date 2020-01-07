@@ -28,6 +28,8 @@ for (kk in 1:length(group)){
 
   FreqTable = rbind(FreqTable,Z1[,c(1,18)],Z2[,c(1,18)],M[,c(1,18)])
 
+  print(paste("calculating IMD for: ",names(group[kk])), sep="")
+
 }
 
 
