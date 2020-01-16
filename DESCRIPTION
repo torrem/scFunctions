@@ -16,7 +16,8 @@ Imports:
    rangeBuilder,
    sp,
    diagram,
-   RColorBrewer
+   RColorBrewer,
+   plot.matrix
 
 Encoding: UTF-8
 LazyData: true
