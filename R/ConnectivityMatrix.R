@@ -326,25 +326,54 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 
 
 
-  mypal <- colorRampPalette(c("blue",
-                              DescTools:: MixColor('blue', 'white', amount1 = 0.8),
-                              DescTools:: MixColor('blue', 'white', amount1 = 0.5),
-                              DescTools::MixColor('blue', 'white', amount1 = 0.2),
-                              "white",'white',
-                              DescTools::MixColor('red', 'white', amount1 = 0.2),
-                              DescTools::MixColor('red', 'white', amount1 = 0.5),
-                              DescTools::MixColor('red', 'white', amount1 = 0.8),
-                              "red"),
-                            bias=1)
 
 
 
-  png(  paste(path,"/MatrixPlot_",name1,"_",name2, ".png",sep="")
-        , width = 12, height = 12, units = "in", res = 600)
 
-  plot(ConnectMatrix4,digits=1, col=mypal(20), cex=1, main=paste(name1," - ", name2, sep="") )
+  nHalf = nrow(ConnectMatrix4)
+  Min = min(ConnectMatrix4)
+  Max = max(ConnectMatrix4)
+  Thresh = 0
 
-dev.off()
+  ## Make vector of colors for values below threshold
+  rc1 = colorRampPalette(colors = c("blue",DescTools:: MixColor('blue', 'white', amount1 = 0.5),
+                                    DescTools:: MixColor('blue', 'white', amount1 = 0.2), "white"), space="Lab")(nHalf)
+  ## Make vector of colors for values above threshold
+  rc2 = colorRampPalette(colors = c("white",  DescTools::MixColor('red', 'white', amount1 = 0.2),
+                                    DescTools::MixColor('red', 'white', amount1 = 0.5),"red"), space="Lab")(nHalf)
+  rampcols = c(rc1, rc2)
+  ## In your example, this line sets the color for values between 49 and 51.
+  rampcols[c(nHalf, nHalf+1)] = rgb(t(col2rgb("white")), maxColorValue=256)
+
+  rb1 = seq(Min, Thresh, length.out=nHalf+1)
+  rb2 = seq(Thresh, Max, length.out=nHalf+1)[-1]
+  rampbreaks = c(rb1, rb2)
+
+  r.range = c(Min, Max)
+
+
+
+
+#
+#   mypal <- colorRampPalette(c("blue",
+#                               DescTools:: MixColor('blue', 'white', amount1 = 0.8),
+#                               DescTools:: MixColor('blue', 'white', amount1 = 0.5),
+#                               DescTools::MixColor('blue', 'white', amount1 = 0.2),
+#                               "white",'white',
+#                               DescTools::MixColor('red', 'white', amount1 = 0.2),
+#                               DescTools::MixColor('red', 'white', amount1 = 0.5),
+#                               DescTools::MixColor('red', 'white', amount1 = 0.8),
+#                               "red"),
+#                             bias=1)
+
+
+
+   png(  paste(path,"/MatrixPlot_",name1,"_",name2, ".png",sep="")
+         , width = 12, height = 12, units = "in", res = 600)
+
+  plot(ConnectMatrix4,digits=1,col = rampcols, breaks=rampbreaks, cex=1, main=paste(name1," - ", name2, sep="") )
+
+ dev.off()
 
 
 }
