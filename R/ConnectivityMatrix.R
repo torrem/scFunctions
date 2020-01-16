@@ -13,7 +13,7 @@
 
 
 
-ConnMap <-function(group1, group2, path){
+ConnMatrix <-function(group1, group2, path){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
