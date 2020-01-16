@@ -369,10 +369,10 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 
 
    png(  paste(path,"/MatrixPlot_",name1,"_",name2, ".png",sep="")
-         , width = 12, height = 12, units = "in", res = 600)
-
+         , width = 12, height = 8, units = "in", res = 600)
+   par(mar=c(5.1, 4.1, 4.1, 4.1))   # adapt margins
   plot(ConnectMatrix4,digits=1,col = rampcols, breaks=rampbreaks, cex=1, main=paste(name1," - ", name2, sep=""),
-       xlab="Spawning Areas", ylab="Settlement Areas")
+       ylab="Spawning Areas", xlab="Settlement Areas")
 
  dev.off()
 
