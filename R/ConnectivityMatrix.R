@@ -330,26 +330,33 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 
 
 
-  nHalf = nrow(ConnectMatrix4)
+  nHalf = 1000
   Min = min(ConnectMatrix4)
   Max = max(ConnectMatrix4)
   Thresh = 0
 
   ## Make vector of colors for values below threshold
   rc1 = colorRampPalette(colors = c("blue",DescTools:: MixColor('blue', 'white', amount1 = 0.5),
-                                    DescTools:: MixColor('blue', 'white', amount1 = 0.2), "white"), space="Lab")(nHalf)
+                                    DescTools:: MixColor('blue', 'white', amount1 = 0.1),
+                                    DescTools:: MixColor('blue', 'white', amount1 = 0.05)),space="Lab")(nHalf)
   ## Make vector of colors for values above threshold
-  rc2 = colorRampPalette(colors = c("white",  DescTools::MixColor('red', 'white', amount1 = 0.2),
+  rc2 = colorRampPalette(colors = c(DescTools::MixColor('red', 'white', amount1 = 0.05),
+                                    DescTools::MixColor('red', 'white', amount1 = 0.1),
                                     DescTools::MixColor('red', 'white', amount1 = 0.5),"red"), space="Lab")(nHalf)
-  rampcols = c(rc1, rc2)
-  ## In your example, this line sets the color for values between 49 and 51.
-  rampcols[c(nHalf, nHalf+1)] = rgb(t(col2rgb("white")), maxColorValue=256)
+  rampcols = c(rc1,"#FEFEFE","#FEFEFE", rc2)
 
-  rb1 = seq(Min, Thresh, length.out=nHalf+1)
+  ## In your example, this line sets the color for values between 49 and 51.
+  #rampcols[c(nHalf, nHalf+1)] = rgb(t(col2rgb("white")), maxColorValue=256)
+
+  rb1 = seq(Min, Thresh, length.out=nHalf+2)
   rb2 = seq(Thresh, Max, length.out=nHalf+1)[-1]
+ #
   rampbreaks = c(rb1, rb2)
 
-  r.range = c(Min, Max)
+  #dd = data.frame(cols=rampcols,breaks = rampbreaks)
+
+
+ # r.range = c(Min, Max)
 
 
 
@@ -368,17 +375,16 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 
 
 
+
    png(  paste(path,"/MatrixPlot_",name1,"_",name2, ".png",sep="")
          , width = 12, height = 8, units = "in", res = 600)
-   par(mar=c(5.1, 4.1, 4.1, 4.1))   # adapt margins
-  plot(ConnectMatrix4,digits=1,col = rampcols, breaks=rampbreaks, cex=1, main=paste(name1," - ", name2, sep=""),
+   par(mar=c(5.1, 5.1, 4.1, 0))   # adapt margins
+  plot(ConnectMatrix4,key=list(cex=0),digits=1,col = rampcols, breaks=rampbreaks,  cex=1, main=paste(name1," - ", name2, sep=""),
        ylab="Spawning Areas", xlab="Settlement Areas")
 
  dev.off()
 
 
 }
-
-
 
 
