@@ -236,20 +236,43 @@ SettlePerM2 <-function(group, path){
 
 
 
+  getBeringMap(addGrid=FALSE,addDepth=FALSE)
+  #getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
+
+  data(ConGridFinal)
+
+    for (i in 1:length(ConGrid1)){
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+      x = ifelse(x > 0,x, 360-abs(x) )
+      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+    }
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+      }
+
+    }
+  }
 
   ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
 
-
-
-getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
  # mypal <- colorRampPalette(c("blue" ,"red","yellow"), bias=1)
  cc = rev(RColorBrewer::brewer.pal(9,"RdYlBu"))
  mypal <- colorRampPalette(c(cc[1], cc[2], cc[3], cc[4], cc[5], cc[6], cc[7], cc[8], cc[9]))
  #mypal <- colorRampPalette(c("blue", "lightblue1", "lightpink", "red"))
- for (i in 1:18){
 
+ PAS = c(1,10,11,12,13,14,15,16,17,18,2,3,4,5,6,7,8,9)
+
+ for (i in 1:18){
+    k = PAS[i]
+    #print(k)
     #ii = which(SettleInZone[,4]==i)
-    c = SettleInZone$ColorCode[i]
+    c = SettleInZone$ColorCode[k]
     if(c<1){c=c+1}
     raster::plot(ConGrid1[i,], lwd=2, col=mypal(100)[c], add=TRUE)
     #raster::plot(ConGrid1[i,], col=cc[3], add=TRUE)
