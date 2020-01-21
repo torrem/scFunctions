@@ -330,9 +330,11 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 
 
 
-  nHalf = 1000
+  nHalf = 10000
   Min = min(ConnectMatrix4)
   Max = max(ConnectMatrix4)
+ # Min = -45
+#Max = 50
   Thresh = 0
 
   ## Make vector of colors for values below threshold
@@ -374,13 +376,15 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 #                             bias=1)
 
 
-
+  #plot(ConnectMatrix4,digits=1, breaks=rampbreaks, col = rampcols )
 
    png(  paste(path,"/MatrixPlot_",name1,"_",name2, ".png",sep="")
          , width = 12, height = 8, units = "in", res = 600)
-   par(mar=c(5.1, 5.1, 4.1, 0))   # adapt margins
-  plot(ConnectMatrix4,key=list(cex=0),digits=1,col = rampcols, breaks=rampbreaks,  cex=1, main=paste(name1," - ", name2, sep=""),
-       ylab="Spawning Areas", xlab="Settlement Areas")
+
+  par(mar=c(5.1, 5.1, 4.1, 0))   # adapt margins
+
+  try( plot(ConnectMatrix4,key=list(cex=0),digits=1, breaks=rampbreaks,  col = rampcols, main=paste(name1," - ", name2, sep=""),
+       ylab="Spawning Areas", xlab="Settlement Areas"),silent=T )
 
  dev.off()
 
