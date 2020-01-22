@@ -18,24 +18,99 @@
 
 
 
-SettledMap <-function(group, path, cl = 'red'){
+SettledMap <-function(group, path, addLegend==TRUE ){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
-  data(ConGridFinal)
+  #data(ConGridFinal)
 
   for (kk in 1:length(group)){
   load(paste(group[kk],"/dfrs.RData",sep=""))
 
+    Aresd = group[kk]
+    Pth =  Aresd[[1]][1]
+    ## make A list##
+
+    C1 = data.table::fread(paste(Pth,"results.disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale.csv",sep="/"))
+    MF =  data.table::fread(paste(Pth,"results.disMELS.IBMs.SnowCrab.Megalopa.Megalopa.csv",sep="/"))
+    ZF =  data.table::fread(paste(Pth,"results.disMELS.IBMs.SnowCrab.Zooea.Zooea.csv",sep="/"))
+
+    dfrs = list( ZF=ZF, MF=MF,C1=C1)
+
+
+
+    for (i in 1:length(dfrs)){
+      dfrs[[i]] =dfrs[[i]][-1,]
+      dfrs[[i]]$'Horiz. position 1' = as.numeric(dfrs[[i]]$'Horiz. position 1')
+      dfrs[[i]]$`Horiz. position 2` = as.numeric(dfrs[[i]]$`Horiz. position 2`)
+     # dfrs[[i]]$ID = as.numeric(dfrs[[i]]$ID)
+     # dfrs[[i]]$"Parent ID" = as.numeric(dfrs[[i]]$"Parent ID")
+     # dfrs[[i]]$"Original ID" = as.numeric(dfrs[[i]]$"Original ID")
+
+
+    }
+
+
+
+
+
+    ## Find settlers ##
+    settlers = dfrs[[3]]
+    #settlers = settlers[!duplicated(settlers$origID), ]
+    settlers = settlers[order(settlers$'Original ID')[!duplicated(sort(settlers$'Original ID'))],] ## makes sure only unique settlers are used
+
+
+    ## Find unsuccessfull Megalope ##
+
+    ddM = which(is.element(dfrs[[2]]$"Original ID", settlers$"Original ID")==TRUE)
+
+    NSM = dfrs[[2]][-ddM,]
+    NSM = NSM[order(NSM$'Original ID')[!duplicated(sort(NSM$'Original ID'),fromLast=TRUE)],]
+
+
+    ## Find unsuccessfull Z2 ##
+    NSZ2 = dfrs[[1]]; NSZ2 = subset(NSZ2, NSZ2$"Life stage type name"=="Z2")
+
+    ddZ2 = which(is.element(NSZ2$"Original ID", dfrs[[2]]$`Original ID`)==TRUE)
+
+    NSZ2 = NSZ2[-ddZ2,]
+    NSZ2 = NSZ2[order(NSZ2$'Original ID')[!duplicated(sort(NSZ2$'Original ID'),fromLast=TRUE)],]
+
+    ## Find unsuccessfull Z1 ##
+    NSZ1 = dfrs[[1]]; NSZ1 = subset(NSZ1, NSZ1$"Life stage type name"=="Z1")
+
+    TZ2 = subset(dfrs[[1]],dfrs[[1]]$"Life stage type name"=="Z2")
+
+    ddZ1 = which(is.element(NSZ1$"Original ID", TZ2$`Original ID`) ==TRUE)
+
+    NSZ1 = NSZ2[-ddZ1,]
+    NSZ1 = NSZ1[order(NSZ1$'Original ID')[!duplicated(sort(NSZ1$'Original ID'),fromLast=TRUE)],]
+
+
+    Pdfrs = list( NSZ1=NSZ1, NSZ2=NSZ2,NSM=NSM, settlers=settlers )
+
+    rmList = vector()
+    for (i in 1:length(Pdfrs)){
+
+      if (nrow(Pdfrs[[i]]) == 0) {rmList = c(rmList,i)}
+    }
+
+    Pdfrs[rmList] = NULL
+
     ## convert coordinates to work with map ##
-    for (i in c(1,4)){
-      # print(paste("Convertving Coordinates for", typeNames[i]))
-      #dfrs[[]]
-      for (kkk in 1:nrow(dfrs[[i]])){
-        dfrs[[i]][kkk,"horizPos1"]  = ifelse(dfrs[[i]][kkk,"horizPos1"] > 0,dfrs[[i]][kkk,"horizPos1"], 360-abs(dfrs[[i]][kkk,"horizPos1"]))
+    for (i in 1:length(Pdfrs)){
+
+      for (kkk in 1:nrow(Pdfrs[[i]])){
+        Pdfrs[[i]][kkk,"Horiz. position 1"]  =
+          ifelse(Pdfrs[[i]][kkk,"Horiz. position 1"] > 0,Pdfrs[[i]][kkk,"Horiz. position 1"], 360-abs(Pdfrs[[i]][kkk,"Horiz. position 1"]))
       }
 
     }
+
+
+
+    data(ConGridFinal)
+
 ## Convert coordinates to fit on map ##
     for (i in 1:length(ConGrid1)){
 
@@ -58,17 +133,22 @@ SettledMap <-function(group, path, cl = 'red'){
 
 
 
-    ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
 
 
 
 
 
 
-  ## Find settlers ##
-     settlers = dfrs[[4]]
-    #settlers = settlers[!duplicated(settlers$origID), ]
-    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
+
+
+
+
+
+
+
+
+
+
 
 
     ## get coords for labels ##
@@ -124,6 +204,7 @@ SettledMap <-function(group, path, cl = 'red'){
 
 
 
+
   ## plot starters and settlers
 
 
@@ -150,10 +231,53 @@ SettledMap <-function(group, path, cl = 'red'){
     }
 
   getBeringMap(openWindow=FALSE)
-  #getBeringMap()
-  points(settlers$horizPos2~settlers$horizPos1, cex=0.8, col=cl, pch=15)
-  raster::plot(ConGrid1,add=TRUE)
+ # getBeringMap()
+
+  data(ConGridFinal)
+
+  ## Convert coordinates to fit on map ##
+  for (i in 1:length(ConGrid1)){
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+      x = ifelse(x > 0,x, 360-abs(x) )
+      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+    }
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+      }
+
+    }
+  }
+
+  ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
+
+  for (i in rev(1:length(Pdfrs))){
+    if(names(Pdfrs)[i]=="settlers"){points(Pdfrs[[i]]$"Horiz. position 2"~Pdfrs[[i]]$"Horiz. position 1", cex=0.8, col='red', pch=15)}
+    if(names(Pdfrs)[i]=="NSM"){points(Pdfrs[[i]]$"Horiz. position 2"~Pdfrs[[i]]$"Horiz. position 1", cex=0.8, col='green', pch=15)}
+    if(names(Pdfrs)[i]=="NSZ2"){points(Pdfrs[[i]]$"Horiz. position 2"~Pdfrs[[i]]$"Horiz. position 1", cex=0.8, col='purple', pch=15)}
+    if(names(Pdfrs)[i]=="NSZ1"){points(Pdfrs[[i]]$"Horiz. position 2"~Pdfrs[[i]]$"Horiz. position 1", cex=0.8, col='pink', pch=15)}
+  }
+  raster::plot(ConGrid1,add=TRUE, lwd=2)
   maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
+
+  if(addLegend==TRUE){
+
+    zbreaks = c("Z1" ,"Z2", "M", "C1")
+
+
+
+    legend(x = "bottomright", legend = zbreaks, fill = c("pink", "purple", "green", "red") ,
+            bg = "white",cex = 1)
+
+  }
+
+
+
   dev.off()
   print(paste("making settled map for: ",names(group[kk])), sep="")
 
