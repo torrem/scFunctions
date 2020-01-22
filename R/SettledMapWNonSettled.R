@@ -18,7 +18,7 @@
 
 
 
-SettledMap <-function(group, path, addLegend==TRUE ){
+SettledMapWNS <-function(group, path, addLegend=TRUE ){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
