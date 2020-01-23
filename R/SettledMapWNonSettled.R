@@ -24,6 +24,104 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
   #data(ConGridFinal)
 
+
+
+
+  data(ConGridFinal)
+
+  ## Convert coordinates to fit on map ##
+  for (i in 1:length(ConGrid1)){
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+      x = ifelse(x > 0,x, 360-abs(x) )
+      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+    }
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+      }
+
+    }
+  }
+
+
+## get coords for labels ##
+  ArrowCoords = data.frame(Region=ConGrid1@data$OBJECTID,dd = rep(NA, length(ConGrid1@data$OBJECTID)),
+                           gg = rep(NA, length(ConGrid1@data$OBJECTID)))
+
+  for (i in 1:length(ConGrid1)){
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+      dd = ConGrid1@polygons[[i]]@Polygons[[1]]@labpt
+      dd[1] = ifelse(dd[1] > 0,dd[1], 360-abs(dd[1]) )
+      ArrowCoords[i,2] = dd[1]
+      ArrowCoords[i,3] = dd[2]
+    }
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+
+      polylist = data.frame(poly = 1:length(ConGrid1@polygons[[i]]@Polygons),
+                            area = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                            dd = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
+                            gg = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)))
+
+
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+
+        polylist[gh,]$area = ConGrid1@polygons[[i]]@Polygons[[gh]]@area
+
+        polylist[gh,]$dd = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[1]
+        polylist[gh,]$dd = ifelse(polylist[gh,]$dd > 0,polylist[gh,]$dd, 360-abs(polylist[gh,]$dd))
+
+        polylist[gh,]$gg = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[2]
+
+      }
+
+      polylist <- polylist[order(-polylist$area),]
+
+      dd = c(mean(c(polylist[1,]$dd, polylist[2,]$dd)), mean(c(polylist[1,]$gg, polylist[2,]$gg)))
+      ArrowCoords[i,2] = dd[1]
+      ArrowCoords[i,3] = dd[2]
+
+
+
+    }
+  }
+
+  ArrowCoords[1,2]=181.5;ArrowCoords[1,3]=60.5
+  ArrowCoords[7,2]=188.3;ArrowCoords[7,3]=56.5
+  ArrowCoords[12,2]=198.8;ArrowCoords[12,3]=57.4
+  ArrowCoords[13,2]=195;ArrowCoords[13,3]=58.7
+  ArrowCoords[14,2]=191.3;ArrowCoords[14,3]=59.3
+  ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
+
+  data(ConGridFinal)
+
+  ## Convert coordinates to fit on map ##
+  for (i in 1:length(ConGrid1)){
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
+      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
+      x = ifelse(x > 0,x, 360-abs(x) )
+      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
+    }
+
+    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
+      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
+        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
+        x = ifelse(x > 0,x, 360-abs(x) )
+        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
+      }
+
+    }
+  }
+
+  ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
+
   for (kk in 1:length(group)){
   load(paste(group[kk],"/dfrs.RData",sep=""))
 
@@ -109,101 +207,6 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
 
 
 
-    data(ConGridFinal)
-
-## Convert coordinates to fit on map ##
-    for (i in 1:length(ConGrid1)){
-
-      if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
-        x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-        x = ifelse(x > 0,x, 360-abs(x) )
-        ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
-      }
-
-      if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
-        for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
-          x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
-          x = ifelse(x > 0,x, 360-abs(x) )
-          ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
-        }
-
-      }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ## get coords for labels ##
-    ArrowCoords = data.frame(Region=ConGrid1@data$OBJECTID,dd = rep(NA, length(ConGrid1@data$OBJECTID)),
-                             gg = rep(NA, length(ConGrid1@data$OBJECTID)))
-
-    for (i in 1:length(ConGrid1)){
-
-      if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
-        dd = ConGrid1@polygons[[i]]@Polygons[[1]]@labpt
-        dd[1] = ifelse(dd[1] > 0,dd[1], 360-abs(dd[1]) )
-        ArrowCoords[i,2] = dd[1]
-        ArrowCoords[i,3] = dd[2]
-      }
-
-      if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
-
-        polylist = data.frame(poly = 1:length(ConGrid1@polygons[[i]]@Polygons),
-                              area = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
-                              dd = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)),
-                              gg = rep(NA,length(ConGrid1@polygons[[i]]@Polygons)))
-
-
-        for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
-
-          polylist[gh,]$area = ConGrid1@polygons[[i]]@Polygons[[gh]]@area
-
-          polylist[gh,]$dd = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[1]
-          polylist[gh,]$dd = ifelse(polylist[gh,]$dd > 0,polylist[gh,]$dd, 360-abs(polylist[gh,]$dd))
-
-          polylist[gh,]$gg = ConGrid1@polygons[[i]]@Polygons[[gh]]@labpt[2]
-
-        }
-
-        polylist <- polylist[order(-polylist$area),]
-
-        dd = c(mean(c(polylist[1,]$dd, polylist[2,]$dd)), mean(c(polylist[1,]$gg, polylist[2,]$gg)))
-        ArrowCoords[i,2] = dd[1]
-        ArrowCoords[i,3] = dd[2]
-
-
-
-      }
-    }
-
-    ArrowCoords[1,2]=181.5;ArrowCoords[1,3]=60.5
-    ArrowCoords[7,2]=188.3;ArrowCoords[7,3]=56.5
-    ArrowCoords[12,2]=198.8;ArrowCoords[12,3]=57.4
-    ArrowCoords[13,2]=195;ArrowCoords[13,3]=58.7
-    ArrowCoords[14,2]=191.3;ArrowCoords[14,3]=59.3
-    ArrowCoords[17,2]=190;ArrowCoords[17,3]=66.3
-
-
-
-
 
   ## plot starters and settlers
 
@@ -233,28 +236,7 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
   getBeringMap(openWindow=FALSE)
  # getBeringMap()
 
-  data(ConGridFinal)
 
-  ## Convert coordinates to fit on map ##
-  for (i in 1:length(ConGrid1)){
-
-    if (length(ConGrid1@polygons[[i]]@Polygons) ==1){
-      x = ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1]
-      x = ifelse(x > 0,x, 360-abs(x) )
-      ConGrid1@polygons[[i]]@Polygons[[1]]@coords[,1] = x
-    }
-
-    if (length(ConGrid1@polygons[[i]]@Polygons) > 1) {
-      for (gh in 1:length(ConGrid1@polygons[[i]]@Polygons)){
-        x = ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1]
-        x = ifelse(x > 0,x, 360-abs(x) )
-        ConGrid1@polygons[[i]]@Polygons[[gh]]@coords[,1] = x
-      }
-
-    }
-  }
-
-  ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
 
   for (i in rev(1:length(Pdfrs))){
     if(names(Pdfrs)[i]=="settlers"){points(Pdfrs[[i]]$"Horiz. position 2"~Pdfrs[[i]]$"Horiz. position 1", cex=0.8, col='red', pch=15)}
@@ -267,12 +249,15 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
 
   if(addLegend==TRUE){
 
-    zbreaks = c("Z1" ,"Z2", "M", "C1")
+    zbreaks = c(paste("Z1: ",nrow(NSZ1), sep=""),
+                paste("Z2: ",nrow(NSZ2), sep=""),
+                paste("M: ",nrow(NSM), sep=""),
+                paste("C1: ",nrow(settlers), sep=""))
 
 
 
-    legend(x = "bottomright", legend = zbreaks, fill = c("pink", "purple", "green", "red") ,
-            bg = "white",cex = 1)
+    legend(x = "bottomright", legend = zbreaks, fill = c("pink", "purple", "green", "red"),
+           bg = "white",cex = 2)
 
   }
 
