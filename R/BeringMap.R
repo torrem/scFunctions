@@ -18,7 +18,7 @@
 #setwd("https://github.com/torrem/SnowCrabFunctions.git")
 
 
-getBeringMap<-function(addGrid=TRUE, addDepth=TRUE, openWindow=TRUE, ConGridNum = FALSE){
+getBeringMap<-function(addGrid=TRUE, addLand = TRUE, addDepth=TRUE, openWindow=TRUE, ConGridNum = FALSE){
 
   data(ak)
   data(ConGridFinal)
@@ -58,7 +58,7 @@ mypal1 = colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgo
 #addRasterLegend(ak, ramp=mypal1(10000), longFrac=0.8, ncolors = 10000)
 }
 if(addDepth==FALSE){plot(ak, col='White', yaxs="i",legend=FALSE)}
-raster::plot(m2, add=TRUE, col='grey')
+if(addLand = TRUE){raster::plot(m2, add=TRUE, col='grey')}
 #dev.off()
 
 #save(ak, m2, file = "AKMapData.RData")
