@@ -57,8 +57,8 @@ raster::plot(ak, col=mypal(10000), yaxs="i", legend=FALSE)
 mypal1 = colorRampPalette(c("blue3", "dodgerblue1" , "cyan","seagreen1","lightgoldenrod1","tan1"))
 #addRasterLegend(ak, ramp=mypal1(10000), longFrac=0.8, ncolors = 10000)
 }
-if(addDepth==FALSE){plot(ak, col='White', yaxs="i",legend=FALSE)}
-if(addLand = TRUE){raster::plot(m2, add=TRUE, col='grey')}
+if(addDepth==FALSE){raster::plot(ak, col='White', yaxs="i",legend=FALSE)}
+if(addLand==TRUE){raster::plot(m2, add=TRUE, col='grey')}
 #dev.off()
 
 #save(ak, m2, file = "AKMapData.RData")
