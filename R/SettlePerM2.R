@@ -236,8 +236,8 @@ SettlePerM2 <-function(group, path){
 
 
 
-  getBeringMap(addGrid=FALSE,addDepth=FALSE)
-  #getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
+  #getBeringMap(addGrid=FALSE,addDepth=FALSE)
+  getBeringMap(openWindow=FALSE,addGrid=FALSE,addDepth=FALSE)
 
   data(ConGridFinal)
 

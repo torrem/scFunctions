@@ -12,9 +12,9 @@
 #'
 
 
-AvgTemp <-function(group1, group2, group3,
-                   g1name ="Hindcast", g2name = "RCP4.5", g3name = "RCP8.5",
-                   col1='#F8766D', col2='#0073C2FF', col3='coral'){
+#col1='#F8766D', col2='#0073C2FF', col3='coral'
+
+AvgTemp <-function(group, path){
 
   FreqTableX = setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("Life_Stage", "Temp"))
 

@@ -55,6 +55,7 @@ getLifeStageInfo.SnowCrab<-function(resType='NEW2.0SC'){
     classInfo[['disMELS.IBMs.SnowCrab.Zooea.Zooea']]                   <-list(info=ZooeaClassInfo,              typeNames=c("Z1"));
     classInfo[['disMELS.IBMs.SnowCrab.Zooea.Zooea']]                   <-list(info=ZooeaClassInfo,              typeNames=c("Z2"));
     classInfo[['disMELS.IBMs.SnowCrab.Megalopa.Megalopa']]             <-list(info=MegalopaClassInfo,           typeNames=c("M1"));
+    classInfo[['disMELS.IBMs.SnowCrab.Megalopa.Megalopa']]             <-list(info=MegalopaClassInfo,           typeNames=c("M2"));
     classInfo[['disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureMale']]     <-list(info=ImmatureMaleClassInfo,       typeNames=c("C1M"));
     classInfo[['disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale']]   <-list(info=ImmatureFemaleClassInfo,     typeNames=c("C1F"));
 
@@ -65,7 +66,9 @@ getLifeStageInfo.SnowCrab<-function(resType='NEW2.0SC'){
                           data.frame(typeName="Z2",      class='disMELS.IBMs.SnowCrab.Zooea.Zooea',
                                      name="Zooea2",   nextType="M1",              stringsAsFactors=FALSE),
                           data.frame(typeName="M1",       class='disMELS.IBMs.SnowCrab.Megalopa.Megalopa',
-                                     name="Megalopa", nextType="C1",              stringsAsFactors=FALSE),
+                                     name="Megalopa1", nextType="M2",              stringsAsFactors=FALSE),
+                          data.frame(typeName="M2",       class='disMELS.IBMs.SnowCrab.Megalopa.Megalopa',
+                                     name="Megalopa2", nextType="C1",              stringsAsFactors=FALSE),
                           data.frame(typeName="C1M",         class='disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureMale',
                                      name="ImmatureMale", nextType="C2M",       stringsAsFactors=FALSE),
                           data.frame(typeName="C1F",          class='disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale',

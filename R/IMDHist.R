@@ -13,7 +13,7 @@
 #'
 
 
-IMDHist <-function(group, path){
+IMDHist <-function(group, mintemp=2 ,path){
 
 FreqTable = data.frame(year=numeric(), typeName=character(), ageInStage=numeric(), TempInStage=numeric() )
 
@@ -62,6 +62,14 @@ for (i in 1:nrow(MCon)){
 
 }
 
+ ### apply is only marginally faster than loop? ###
+ #  start.time <- Sys.time()
+ # MCon$temp =  apply(MCon, 1, function(x){
+ #    return(  median( M[which(M$origID == x[4]   ),]$temperature )            )
+ #  })
+ # end.time <- Sys.time()
+ # end.time - start.time
+
 
   Z2Con = Z2[order(Z2$origID)[!duplicated(sort(Z2$origID),fromLast=TRUE)],]
   #MCon2 = dfrs[[2]];  MCon2 = subset(MCon2, ageInStage>0)
@@ -105,7 +113,11 @@ for (i in 1:nrow(MCon)){
 
 }
 
+ff1 = FreqTable
+
 ff = FreqTable
+
+FreqTable = ff
 
 FreqTable = as.data.frame(FreqTable)
 colnames(FreqTable)[1:4] = c("year", 'typeName', 'ageInStage', 'temp' )
@@ -121,6 +133,7 @@ levels(FreqTable$typeName) <- c("Z1", "Z2", "M")
 FreqTable$ageInStage = as.numeric(as.character(FreqTable$ageInStage))
 FreqTable$temp = as.numeric(as.character(FreqTable$temp))
 
+#FreqTable = subset(FreqTable, temp>3)
 
 if(length(strsplit(names(group[1]), '_')[[1]])==2){png( paste(path,"/IMDHist_",
                                                                ifelse(regexpr("Temp", group[1])[1] >0,"TempIMD", "FixedIMD"),"_",
@@ -148,14 +161,59 @@ if(length(strsplit(names(group[1]), '_')[[1]])>2){png(   paste(path,"/IMDHist_",
 
 
 
-g = lattice::histogram(~ ageInStage | typeName, data = FreqTable,
-                   layout = c(3, 1), scales=list(tck=c(1,0), alternating=FALSE))
-
-p =  lattice::densityplot(~temp|typeName, data=FreqTable, plot.points=FALSE,
-                      layout = c(3, 1), strip=FALSE,scales=list(tck=c(1,0), alternating=FALSE))
 
 
-gridExtra::grid.arrange(g, p, nrow = 2)
+library(MASS)
+
+# Default call
+k <- kde2d(FreqTable$ageInStage ~ FreqTable$temp, n=200)
+image(k)
+
+
+
+
+rf <- colorRampPalette(rev(brewer.pal(11,'Spectral')))
+r <- rf(32)
+
+
+
+
+
+
+
+
+library(ggplot2)
+
+# Default call (as object)
+p <- ggplot(FreqTable, aes(ageInStage,temp))
+
+
+## raster
+p + stat_density_2d(geom = "raster", aes(fill = stat(ndensity)), contour = FALSE)+
+  facet_grid(. ~ typeName) + scale_fill_viridis_c(limits = c(0.001, .01),option = "plasma", na.value= "white")
+
+
+## contour
+hh= p + stat_density_2d(aes(fill = stat(nlevel)), n = 150,  geom = "polygon")+
+  facet_grid(. ~ typeName) + scale_fill_viridis_c(option = "plasma")
+
+
+function(x)
+{
+  r <- quantile(x, c(0.25, 0.75))
+  h <- (r[2] - r[1])/1.34
+  4 * 1.06 * min(sqrt(var(x)), h) * length(x)^(-1/5)
+}
+
+#
+# g = lattice::histogram(~ ageInStage | typeName, data = FreqTable,
+#                    layout = c(3, 1), scales=list(tck=c(1,0), alternating=FALSE))
+#
+# p =  lattice::densityplot(~temp|typeName, data=FreqTable, plot.points=FALSE,
+#                       layout = c(3, 1), strip=FALSE,scales=list(tck=c(1,0), alternating=FALSE))
+#
+#
+# gridExtra::grid.arrange(g, p, nrow = 2)
 
 
 
