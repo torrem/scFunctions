@@ -123,6 +123,31 @@ CMlist <- vector("list", 2)
   sp::proj4string(settlers) <- sp::proj4string(ConGrid1)
   s = sp::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
+
+
+
+  ##### subset out settlers by time and temperature #####_
+
+  settlers = subset(settlers, age<=200 & temperature > 0)
+
+
+  # library(ggplot2)
+  #
+  # # Default call (as object)
+  # p <- ggplot(settlers, aes(age,temperature))
+  #
+  #
+  # # ## raster
+  # p + stat_density_2d(geom = "raster", aes(fill = stat(ndensity)), contour = FALSE)+
+  #   scale_fill_viridis_c(option = "plasma")
+  #
+  # p + stat_density_2d(aes(fill = stat(nlevel)), n = 100,  geom = "polygon")+
+  #    scale_fill_viridis_c(option = "plasma")
+
+
+
+## make connectivity matrix ##
+
   StartInRegion = data.frame(OBJECTID = 1:18, NumStarters = rep(NA, 18))
   for (i in 1:18){
     d = nrow(subset(starters, OBJECTID==i))
@@ -257,7 +282,7 @@ ConnectMatrix = apply(simplify2array(CMlist), 1:2, mean)
 
 
 
-   getBeringMap(openWindow=TRUE,addGrid=FALSE, addLand = FALSE, addDepth=FALSE, ConGridNum = FALSE)
+   getBeringMap(openWindow=FALSE,addGrid=FALSE, addLand = FALSE, addDepth=FALSE, ConGridNum = FALSE)
 
 
 

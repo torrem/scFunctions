@@ -135,6 +135,7 @@ SettlePerM2 <-function(group, path){
   sp::proj4string(settlers) <- sp::proj4string(ConGrid1)
   s = sp::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
+  settlers = subset(settlers, age<=200 & temperature > 0)
 
   RegionCode = data.frame(MapRegion = ConGrid1$OBJECTID, MapOrder = 1:18 )
 

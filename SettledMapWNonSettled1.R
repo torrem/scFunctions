@@ -22,10 +22,13 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
 
   info<-getLifeStageInfo.SnowCrab();
   typeNames<-factor(info$lifeStageTypes$typeName,levels=info$lifeStageTypes$typeName);#typeNames as factor levels
+  #data(ConGridFinal)
+
+
+## map stuff ####
+
   data(ConGridFinal)
 
-
-  ### Set up map stuff###----
   ## Convert coordinates to fit on map ##
   for (i in 1:length(ConGrid1)){
 
@@ -46,7 +49,6 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
   }
 
 
-## get coords for labels ##
   ArrowCoords = data.frame(Region=ConGrid1@data$OBJECTID,dd = rep(NA, length(ConGrid1@data$OBJECTID)),
                            gg = rep(NA, length(ConGrid1@data$OBJECTID)))
 
@@ -101,201 +103,54 @@ SettledMapWNS <-function(group, path, addLegend=TRUE ){
 
 
 
-
-  ### Get trajectories for each individual larvae###----
+#### filter out unsuccesful individuals ####
   coords = data.frame(Year=vector(),Type=vector(),ID=vector(),x=vector(), y=vector())
 
   for (kk in 1:length(group)){
-  load(paste(group[kk],"/dfrs.RData",sep=""))
-
-    Aresd = group[kk]
-    Pth =  Aresd[[1]][1]
-    ## make A list##
-
-    C1 = data.table::fread(paste(Pth,"results.disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale.csv",sep="/"))
-    MF =  data.table::fread(paste(Pth,"results.disMELS.IBMs.SnowCrab.Megalopa.Megalopa.csv",sep="/"))
-    ZF =  data.table::fread(paste(Pth,"results.disMELS.IBMs.SnowCrab.Zooea.Zooea.csv",sep="/"))
-
-    dfrs = list( ZF=ZF, MF=MF,C1=C1)
+    resdr = group[kk]
+    load(paste(resdr,"/dfrs.RData",sep=""))
 
 
-
-    for (i in 1:length(dfrs)){
-      dfrs[[i]] =dfrs[[i]][-1,]
-      dfrs[[i]]$'Horiz. position 1' = as.numeric(dfrs[[i]]$'Horiz. position 1')
-      dfrs[[i]]$`Horiz. position 2` = as.numeric(dfrs[[i]]$`Horiz. position 2`)
-     # dfrs[[i]]$ID = as.numeric(dfrs[[i]]$ID)
-     # dfrs[[i]]$"Parent ID" = as.numeric(dfrs[[i]]$"Parent ID")
-     # dfrs[[i]]$"Original ID" = as.numeric(dfrs[[i]]$"Original ID")
-
+    for (i in c(1:4)){
+      # print(paste("Convertving Coordinates for", typeNames[i]))
+      #dfrs[[]]
+      for (kkk in 1:nrow(dfrs[[i]])){
+        dfrs[[i]][kkk,"horizPos1"]  = ifelse(dfrs[[i]][kkk,"horizPos1"] > 0,dfrs[[i]][kkk,"horizPos1"], 360-abs(dfrs[[i]][kkk,"horizPos1"]))
+      }
 
     }
-
-
 
 
 
     ## Find settlers ##
     settlers = dfrs[[3]]
     #settlers = settlers[!duplicated(settlers$origID), ]
-    settlers = settlers[order(settlers$'Original ID')[!duplicated(sort(settlers$'Original ID'))],] ## makes sure only unique settlers are used
+    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
+    settlers = subset(settlers, age>=200 | temperature < 0)
 
+    ## Find unsuccessfull Megalope 2 ##
+    NSM2 = dfrs[[2]]; NSM2 = subset(NSM2, NSM2$typeName=="M2")
+    NSM2 = NSM2[order(NSM2$origID)[!duplicated(sort(NSM2$origID),fromLast=TRUE)],]
+    NSM2 = subset(NSM2, ageInStage>=300 )
 
-    ## Find unsuccessfull M2 ##
-    NSM2 = dfrs[[2]]; NSM2 = subset(NSM2, NSM2$"Life stage type name"=="M2")
-    ddM2 = which(is.element(NSM2$"Original ID", dfrs[[3]]$"Original ID")==TRUE)
-    NSM2 = NSM2[-ddM2,]
-    NSM2 = NSM2[order(NSM2$'Original ID')[!duplicated(sort(NSM2$'Original ID'),fromLast=TRUE)],]
-
-    ## Find unsuccessfull M1 ##
-    NSM1 = dfrs[[2]]; NSM1 = subset(NSM1, NSM1$"Life stage type name"=="M1")
-    M2All = subset(dfrs[[2]], dfrs[[2]]$"Life stage type name"=="M2")
-    ddM1 = which(is.element(NSM1$"Original ID",  M2All$`Original ID`)==TRUE)
-    NSM1 = NSM1[-ddM1,]
-    NSM1 = NSM1[order(NSM1$'Original ID')[!duplicated(sort(NSM1$'Original ID'),fromLast=TRUE)],]
-
+    ## Find unsuccessfull Megalope 1 ##
+    NSM1 = dfrs[[2]]; NSM1 = subset(NSM1, NSM1$typeName=="M1")
+    NSM1 = NSM1[order(NSM1$origID)[!duplicated(sort(NSM1$origID),fromLast=TRUE)],]
+    NSM1 = subset(NSM1, ageInStage>=100 | temperature < 0)
 
     ## Find unsuccessfull Z2 ##
-    NSZ2 = dfrs[[1]]; NSZ2 = subset(NSZ2, NSZ2$"Life stage type name"=="Z2")
-    M1All = subset(dfrs[[2]], dfrs[[2]]$"Life stage type name"=="M1")
-    ddZ2 = which(is.element(NSZ2$"Original ID", M1All$`Original ID`)==TRUE)
-    NSZ2 = NSZ2[-ddZ2,]
-    NSZ2 = NSZ2[order(NSZ2$'Original ID')[!duplicated(sort(NSZ2$'Original ID'),fromLast=TRUE)],]
+    NSZ2 = dfrs[[1]]; NSZ2 = subset(NSZ2, NSZ2$typeName=="Z2")
+    NSZ2 = NSZ2[order(NSZ2$origID)[!duplicated(sort(NSZ2$origID),fromLast=TRUE)],]
+    NSZ2 = subset(NSZ2, ageInStage>=100 | temperature < 0)
 
-    ## Find unsuccessfull Z1 ##
-    NSZ1 = dfrs[[1]]; NSZ1 = subset(NSZ1, NSZ1$"Life stage type name"=="Z1")
-    Z2All = subset(dfrs[[1]], dfrs[[1]]$"Life stage type name"=="Z2")
-    ddZ1 = which(is.element(NSZ2$"Original ID", Z2All$`Original ID`)==TRUE)
-    NSZ1 = NSZ1[-ddZ1,]
-    NSZ1 = NSZ1[order(NSZ1$'Original ID')[!duplicated(sort(NSZ1$'Original ID'),fromLast=TRUE)],]
-    Z1All = subset(dfrs[[1]], dfrs[[1]]$"Life stage type name"=="Z1")
+    ## Find unsuccessfull Z2 ##
+    NSZ1 = dfrs[[1]]; NSZ1 = subset(NSZ1, NSZ1$typeName=="Z1")
+    NSZ1 = NSZ1[order(NSZ1$origID)[!duplicated(sort(NSZ1$origID),fromLast=TRUE)],]
+    NSZ1 = subset(NSZ1, ageInStage>=100 | temperature < 0)
 
 
 
-
-
-
-
-
-    Pdfrs = list( NSZ1=NSZ1, NSZ2=NSZ2,NSM1=NSM1, NSM2 = NSM2, settlers=settlers)
-
-    rmList = vector()
-    for (i in 1:length(Pdfrs)){
-
-      if (nrow(Pdfrs[[i]]) == 0) {rmList = c(rmList,i)}
-    }
-
-    Pdfrs[rmList] = NULL
-
-
-
-
-## find paths of sucessfull individuals ##
-
-
-    ## Find successfull M2 ##
-    SM2 = dfrs[[2]]; SM2 = subset(SM2, SM2$"Life stage type name"=="M2")
-    ddsM2 = which(is.element(SM2$"Original ID", dfrs[[3]]$"Original ID")==TRUE)
-    SM2 = SM2[ddsM2,]
-    SM2 = SM2[,c(1:6,14)]
-   # SM2 = SM2[order(SM2$'Original ID')[!duplicated(sort(SM2$'Original ID'),fromLast=TRUE)],]
-
-    ## Find successfull M1 ##
-    SM1 = dfrs[[2]]; SM1 = subset(SM1, SM1$"Life stage type name"=="M1")
-    ddsM1 = which(is.element(SM1$"Original ID", dfrs[[3]]$"Original ID")==TRUE)
-    SM1 = SM1[ddsM1,]
-    SM1 = SM1[,c(1:6,14)]
-   # SM1 = SM1[order(SM1$'Original ID')[!duplicated(sort(SM1$'Original ID'),fromLast=TRUE)],]
-
-    ## Find successfull Z2 ##
-    SZ2 = dfrs[[1]]; SZ2 = subset(SZ2, SZ2$"Life stage type name"=="Z2")
-    ddsZ2 = which(is.element(SZ2$"Original ID", dfrs[[3]]$"Original ID")==TRUE)
-    SZ2 = SZ2[ddsZ2,]
-    SZ2 = SZ2[,c(1:6,14)]
-   # SZ2 = SZ2[order(SZ2$'Original ID')[!duplicated(sort(SZ2$'Original ID'),fromLast=TRUE)],]
-
-    ## Find successfull Z1 ##
-    SZ1 = dfrs[[1]]; SZ1 = subset(SZ1, SZ1$"Life stage type name"=="Z1")
-    ddsZ1 = which(is.element(SZ1$"Original ID", dfrs[[3]]$"Original ID")==TRUE)
-    SZ1 = SZ1[ddsZ1,]
-    SZ1 = SZ1[,c(1:6,14)]
-    #SZ1 = SZ1[order(SZ1$'Original ID')[!duplicated(sort(SZ1$'Original ID'),fromLast=TRUE)],]
-
-
-    SC1 = settlers[,c(1:6,14)]
-
-    Sdfrs = rbind( SZ1, SZ2,SM1, SM2, SC1)
-
-
-    ## sort by orig ID THEN Time
-    Sdfrs = Sdfrs[    order( Sdfrs$"Original ID",  Sdfrs$"Time (s)"  )   ,   ]
-
-
-UNIQID = unique(Sdfrs$'Original ID')
-Successful = data.frame(    ID = rep(NA, length(UNIQID)), Track = rep(NA, length(UNIQID))      )
-
-for (i in 1:length(UNIQID)){
-ww = Sdfrs[which(Sdfrs$`Original ID` == UNIQID[1]),]
-
-
-a = strsplit(ww[ggg,]$track, ";")
-for (gg in 1:length(ww)){
-  aa = strsplit(a[[1]][gg], ":")
-  coords=rbind(coords,
-               c(regmatches(group[kk], regexpr("[:0-2:][0-9][0-9][0-9]", group[kk])),
-                 Pdfrs[[j]]$`Life stage type name`[1],
-                 sss[1]$`Original ID`, aa[[1]][1], aa[[1]][2]))
-  coords = setNames(coords, c('Year','Type',"ID", "x", "y"))
-  coords$Year = as.numeric(coords$Year)
-  coords$Type = as.character(coords$Type)
-  coords$ID = as.numeric(as.character(coords$ID))
-  coords$x = as.numeric(as.character(coords$x));coords$y = as.numeric(as.character(coords$y))
-}
-
-
-
-
-
-
-
-
-
-
-Successful[i,] = c(ww$`Original ID`[1]
-
-
-
-
-}
-
-
-
-
-
-
-
-    #sss = subset(alldfrs[[i]], alldfrs[[i]]$`Original ID`==UNID[jj])
-
-for (j in 1:length(Pdfrs)){
-
-## make table of unique ids
-    UNID = Pdfrs[[j]]$`Original ID`
-    UNID = sample(UNID,5)
-  for(jj in 1:length(UNID)){
-
-    sss = subset(alldfrs, alldfrs$`Original ID`==UNID[jj])
-    for (ggg in 1:nrow(sss)){
-
-
-
-
-}
-}
-}
-
-
-
-    print(paste("compiling trajectories for: ",names(group[kk])), sep="")
+    print(paste("compiling unsucessful XY vlaues for: ",names(group[kk])), sep="")
 
   }
 
@@ -305,35 +160,6 @@ for (j in 1:length(Pdfrs)){
 
 
 
-    ###### take coords and map trajectories ####_
-
-
-  # ## convert coordinates to work with map ##
-    for (kkk in 1:nrow(coords)){
-      coords$x  =
-        ifelse(coords$x > 0,coords$x, 360-abs(coords$x))
-    }
-
-
-
-  CCoords = subset(coords, Type == "C1F")
-  MCoords = subset(coords, Type == "M1")
-  Z2Coords = subset(coords, Type == "Z2")
-  Z1Coords = subset(coords, Type == "Z1")
-
-
-
-  Crd = list(CCoords =CCoords, MCoords=MCoords, Z2Coords=Z2Coords, Z1Coords=Z1Coords  )
-
-
-
-  rmList2 = vector()
-  for (i in 1:length(Crd)){
-
-    if (nrow(Crd[[i]]) == 0) {rmList2 = c(rmList2,i)}
-  }
-
-  Crd[rmList2] = NULL
 
 
 
@@ -366,7 +192,7 @@ for (j in 1:length(Pdfrs)){
 
 
 
-  getBeringMap(openWindow=FALSE, addGrid = FALSE,addDepth=FALSE)
+  getBeringMap(openWindow=TRUE, addGrid = FASLE,addDepth=FALSE)
   #getBeringMap(addDepth=FALSE, addGrid = FALSE)
 
 
@@ -394,28 +220,24 @@ for (j in 1:length(Pdfrs)){
   ConGrid1 <- maptools::unionSpatialPolygons(ConGrid1, ConGrid1@data$OBJECTID, avoidGEOS=FALSE)
 
 
+
+
+  ## plot xy coords for each life stage ##
+
+  points(settlers$horizPos2~settlers$horizPos1, col="purple")
+  points(NSM2$horizPos2~NSM2$horizPos1, col="green")
+  points(NSZ1$horizPos2~NSZ1$horizPos1, col="lightblue")
+  points(NSM1$horizPos2~NSM1$horizPos1, col="purple", pch=16)
+  points(NSZ2$horizPos2~NSZ2$horizPos1, col="blue", pch=16)
+
+
+
+
+
+
+
   raster::plot(ConGrid1,add=TRUE, lwd=2)
   maptools::pointLabel(ArrowCoords$dd, ArrowCoords$gg,labels=paste(ArrowCoords$Region), cex=1.5, col="black")
-
-## plot trajectories for each life stage ##
-  for (u in 1:length(Crd)){
-
-    cID = unique(Crd[[u]]$ID)
-
-for (uu in 1:length(cID)){
-  ghy = subset(Crd[[u]], ID == cID[uu])
-    trj <- TrajFromCoords(ghy[,c(4,5)])
-  resampled <- TrajRediscretize(trj, 0.0003)
-
-  if(ghy$Type[1] == "C1F"){plot(resampled, lwd = 2,draw.start.pt = FALSE, col= adjustcolor( "blue4", alpha.f = 0.3), add=TRUE)}
-  if(ghy$Type[1] == "M1"){plot(resampled, lwd = 2,draw.start.pt = FALSE, col= adjustcolor( "red", alpha.f = 0.3), add=TRUE)}
-  if(ghy$Type[1] == "Z2"){plot(resampled, lwd = 2,draw.start.pt = FALSE, col= adjustcolor( "goldenrod2", alpha.f = 0.3), add=TRUE)}
-  if(ghy$Type[1] == "Z1"){plot(resampled, lwd = 2,draw.start.pt = FALSE, col= adjustcolor( "green", alpha.f = 0.3), add=TRUE)}
-
-  }
-}
-
-
 
   if(addLegend==TRUE){
 

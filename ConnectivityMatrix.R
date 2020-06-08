@@ -97,6 +97,14 @@ ConnMatrix <-function(group1, group2, path){
     sp::proj4string(settlers) <- sp::proj4string(ConGrid1)
     s = sp::over(settlers, ConGrid1); settlers= cbind(data.frame(settlers),s) ## match ResultsConn file to connectivity grid
 
+
+
+    ##### subset out settlers by time and temperature #####_
+
+    settlers = subset(settlers, age<=200 & temperature > 0)
+
+
+
     StartInRegion = data.frame(OBJECTID = 1:18, NumStarters = rep(NA, 18))
     for (i in 1:18){
       d = nrow(subset(starters, OBJECTID==i))
@@ -282,6 +290,7 @@ ConnectMatrix4 = round(ConnectMatrix4,1)
 ## group1 names ##
 ## hindcast names##
 if(length(strsplit(names(group1[1]), '_')[[1]])==2){name1 = paste(ifelse(regexpr("Temp", group1[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                  ifelse(regexpr("AltVM", group1[1])[1] >0,"AltVM", ""),"_",
                                                                   strsplit(names(group1[1]),'_')[[1]][1],"_",
                                                                   strsplit(names(group1[1]),'_')[[1]][2],"-",
                                                                   strsplit(names(group1[length(group1)]),'_')[[1]][2],sep="")
@@ -290,21 +299,22 @@ if(length(strsplit(names(group1[1]), '_')[[1]])==2){name1 = paste(ifelse(regexpr
 
 
 
-## forecast names##
-if(length(strsplit(names(group1[1]), '_')[[1]])>2){name1 = paste(ifelse(regexpr("Temp", group1[1])[1] >0,"TempIMD", "FixedIMD"),"_",
-                                                                 strsplit(names(group1[1]),'_')[[1]][1],"_",
-                                                                 strsplit(names(group1[1]),'_')[[1]][2],"_",
-                                                                 strsplit(names(group1[1]),'_')[[1]][3],"-",
-                                                                 strsplit(names(group1[length(group1)]),'_')[[1]][3],sep="")
-
-
-}
+# ## forecast names##
+# if(length(strsplit(names(group1[1]), '_')[[1]])>2){name1 = paste(ifelse(regexpr("Temp", group1[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+#                                                                  strsplit(names(group1[1]),'_')[[1]][1],"_",
+#                                                                  strsplit(names(group1[1]),'_')[[1]][2],"_",
+#                                                                  strsplit(names(group1[1]),'_')[[1]][3],"-",
+#                                                                  strsplit(names(group1[length(group1)]),'_')[[1]][3],sep="")
+#
+#
+# }
 
 
 
 ## group2 names ##
 ## hindcast names##
 if(length(strsplit(names(group2[1]), '_')[[1]])==2){name2 = paste(ifelse(regexpr("Temp", group2[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+                                                                  ifelse(regexpr("AltVM", group1[1])[1] >0,"AltVM", ""),"_",
                                                                   strsplit(names(group2[1]),'_')[[1]][1],"_",
                                                                   strsplit(names(group2[1]),'_')[[1]][2],"-",
                                                                   strsplit(names(group2[length(group2)]),'_')[[1]][2],sep="")
@@ -313,20 +323,15 @@ if(length(strsplit(names(group2[1]), '_')[[1]])==2){name2 = paste(ifelse(regexpr
 
 
 
-## forecast names##
-if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr("Temp", group2[1])[1] >0,"TempIMD", "FixedIMD"),"_",
-                                                                 strsplit(names(group2[1]),'_')[[1]][1],"_",
-                                                                 strsplit(names(group2[1]),'_')[[1]][2],"_",
-                                                                 strsplit(names(group2[1]),'_')[[1]][3],"-",
-                                                                 strsplit(names(group2[length(group2)]),'_')[[1]][3],sep="")
-
-
-}
-
-
-
-
-
+# ## forecast names##
+# if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr("Temp", group2[1])[1] >0,"TempIMD", "FixedIMD"),"_",
+#                                                                  strsplit(names(group2[1]),'_')[[1]][1],"_",
+#                                                                  strsplit(names(group2[1]),'_')[[1]][2],"_",
+#                                                                  strsplit(names(group2[1]),'_')[[1]][3],"-",
+#                                                                  strsplit(names(group2[length(group2)]),'_')[[1]][3],sep="")
+#
+#
+# }
 
 
 
@@ -378,12 +383,12 @@ if(length(strsplit(names(group2[1]), '_')[[1]])>2){name2 = paste(ifelse(regexpr(
 
   #plot(ConnectMatrix4,digits=1, breaks=rampbreaks, col = rampcols )
 
-   png(  paste(path,"/MatrixPlot_",name1,"_",name2, ".png",sep="")
+   png(  paste(path,"/MatrixPlot_",name2,"_",name1, ".png",sep="")
          , width = 12, height = 8, units = "in", res = 600)
 
   par(mar=c(5.1, 5.1, 4.1, 0))   # adapt margins
 
-  try( plot(ConnectMatrix4,key=list(cex=0),digits=1, breaks=rampbreaks,  col = rampcols, main=paste(name1," - ", name2, sep=""),
+  try( plot(ConnectMatrix4,key=list(cex=0),digits=1, breaks=rampbreaks,  col = rampcols, main=paste(name2," - ", name1, sep=""),
        ylab="Spawning Areas", xlab="Settlement Areas"),silent=T )
 
  dev.off()

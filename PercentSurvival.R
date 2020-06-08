@@ -35,7 +35,7 @@ Survive = vector()
 
     ## Find settlers ##
     settlers = dfrs[[3]]
-    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]-
+    settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],]
 
     ## Find starters ##
     starters = dfrs[[1]];

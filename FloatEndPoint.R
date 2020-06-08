@@ -154,9 +154,16 @@ Depths$propRec = Depths$Freq/nrow(settlers)
 Zres = rbind(Zres, Zones)
 Dres = rbind(Dres, Depths)
 
-print(paste("calculating connecivity matrix for: ",names(group[kk])), sep="")
+print(paste("calculating Float End Point for: ",names(group[kk])), sep="")
 
 }
+
+Zres$Yr = substr(as.character(Zres$Year), start=3, stop=4)
+Zres$Yr = as.factor(Zres$Yr)
+Zres$Yr = factor(Zres$Yr, levels = c(71:99, "00","01","02","03","04"))
+Dres$Yr = substr(as.character(Dres$Year), start=3, stop=4)
+Dres$Yr = as.factor(Dres$Yr)
+Dres$Yr = factor(Dres$Yr, levels = c(71:99, "00","01","02","03","04"))
 
 ### make Plots
 
@@ -164,7 +171,7 @@ print(paste("calculating connecivity matrix for: ",names(group[kk])), sep="")
   library(ggpubr)
 
   #Zone Plots
- A =  ggplot(data=Zres, aes(x=Year, y=propRec, group=Zone, colour=Zone)) +
+ A =  ggplot(data=Zres, aes(x=Yr, y=propRec, group=Zone, colour=Zone)) +
     geom_point() +
     geom_line()+
     #ylim(0,10)+
@@ -172,7 +179,7 @@ print(paste("calculating connecivity matrix for: ",names(group[kk])), sep="")
     ylab("Proportion of Total Settlement")+
     theme(text = element_text(size=20))
 
- B =  ggplot(data=Zres, aes(x=Year, y=PSurv, group=Zone, colour=Zone)) +
+ B =  ggplot(data=Zres, aes(x=Yr, y=PSurv, group=Zone, colour=Zone)) +
     geom_point() +
     geom_line()+
     #ylim(0,10)+
@@ -183,7 +190,7 @@ print(paste("calculating connecivity matrix for: ",names(group[kk])), sep="")
 Dres$Depth = as.factor(Dres$Depth)
 
   #Depth Plots
-C =   ggplot(data=Dres, aes(x=Year, y=propRec, group=Depth, colour=Depth)) +
+C =   ggplot(data=Dres, aes(x=Yr, y=propRec, group=Depth, colour=Depth)) +
     geom_point() +
     geom_line()+
     #ylim(0,10)+
@@ -191,7 +198,7 @@ C =   ggplot(data=Dres, aes(x=Year, y=propRec, group=Depth, colour=Depth)) +
     ylab("Proportion of Total Settlement")+
     theme(text = element_text(size=20))
 
- D =  ggplot(data=Dres, aes(x=Year, y=PSurv, group=Depth, colour=Depth)) +
+ D =  ggplot(data=Dres, aes(x=Yr, y=PSurv, group=Depth, colour=Depth)) +
     geom_point() +
     geom_line()+
     #ylim(0,10)+
@@ -211,7 +218,7 @@ C =   ggplot(data=Dres, aes(x=Year, y=propRec, group=Depth, colour=Depth)) +
                                                                 strsplit(names(group[1]),'_')[[1]][1],"_",
                                                                 strsplit(names(group[1]),'_')[[1]][2],"-",
                                                                 strsplit(names(group[length(group)]),'_')[[1]][2],".png",sep="")
-                                                          , width = 16, height = 10, units = "in", res = 600)
+                                                          , width = 24, height = 10, units = "in", res = 600)
 
  }
 
@@ -222,7 +229,7 @@ C =   ggplot(data=Dres, aes(x=Year, y=propRec, group=Depth, colour=Depth)) +
                                                                 strsplit(names(group[1]),'_')[[1]][2],"_",
                                                                 strsplit(names(group[1]),'_')[[1]][3],"-",
                                                                 strsplit(names(group[length(group)]),'_')[[1]][3],".png",sep="")
-                                                          , width = 16, height = 10, units = "in", res = 600)
+                                                          , width = 24, height = 10, units = "in", res = 600)
 
  }
 
@@ -230,7 +237,7 @@ C =   ggplot(data=Dres, aes(x=Year, y=propRec, group=Depth, colour=Depth)) +
 
   figure <- ggarrange(A, B, C, D,
                       ncol = 2, nrow = 2)
-figure
+print(figure)
 
 dev.off()
 }
