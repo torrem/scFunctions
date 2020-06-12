@@ -11,7 +11,7 @@
 #'
 #'
 
-
+library(viridis)
 
 ConnMatrixMean <-function(group, path){
 
@@ -136,12 +136,26 @@ ConnMatrixMean <-function(group, path){
 
 
     CMlist[[kk]] = ConnectMatrix
-    names(CMlist)[kk] = paste("CM",names(group1[kk]), sep="")
+    names(CMlist)[kk] = paste("CM",names(group[kk]), sep="")
 
-    print(paste("calculating connecivity matrix for: ",names(group1[kk])), sep="")
+    print(paste("calculating connecivity matrix for: ",names(group[kk])), sep="")
   }
 
-  ConnectMatrix1 = apply(simplify2array(CMlist), 1:2, mean)
+
+
+
+  ConnectMatrixMean = apply(simplify2array(CMlist), 1:2, mean)
+  ConnectMatrixVAR = apply(simplify2array(CMlist), 1:2, var)
+
+  ConnectMatrixMean = ConnectMatrixMean[1:8,]
+  ConnectMatrixMean <- apply(ConnectMatrixMean, 2, rev)
+
+  ConnectMatrixVAR = ConnectMatrixVAR[1:8,]
+  ConnectMatrixVAR <- apply(ConnectMatrixVAR, 2, rev)
+
+
+
+
 
 
 
@@ -155,8 +169,8 @@ ConnMatrixMean <-function(group, path){
 
 ## group1 names ##
 ## hindcast names##
-if(length(strsplit(names(group[1]), '_')[[1]])==2){name1 = paste(ifelse(regexpr("Temp", group1[1])[1] >0,"TempIMD", "FixedIMD"),"_",
-                                                                  ifelse(regexpr("AltVM", group1[1])[1] >0,"AltVM", ""),"_",
+if(length(strsplit(names(group[1]), '_')[[1]])==2){name1 = paste(ifelse(regexpr("Temp", group[1])[1] >0,"TempMM", "FixedMM"),"_",
+                                                                  ifelse(regexpr("AltVM", group[1])[1] >0,"AltVM", ""),"_",
                                                                   strsplit(names(group[1]),'_')[[1]][1],"_",
                                                                   strsplit(names(group[1]),'_')[[1]][2],"-",
                                                                   strsplit(names(group[length(group)]),'_')[[1]][2],sep="")
@@ -167,61 +181,24 @@ if(length(strsplit(names(group[1]), '_')[[1]])==2){name1 = paste(ifelse(regexpr(
 
 
 
-#   nHalf = 10000
-#   Min = min(ConnectMatrix4)
-#   Max = max(ConnectMatrix4)
-#  # Min = -45
-# #Max = 50
-#   Thresh = 0
-#
-#   ## Make vector of colors for values below threshold
-#   rc1 = colorRampPalette(colors = c("blue",DescTools:: MixColor('blue', 'white', amount1 = 0.5),
-#                                     DescTools:: MixColor('blue', 'white', amount1 = 0.1),
-#                                     DescTools:: MixColor('blue', 'white', amount1 = 0.05)),space="Lab")(nHalf)
-#   ## Make vector of colors for values above threshold
-#   rc2 = colorRampPalette(colors = c(DescTools::MixColor('red', 'white', amount1 = 0.05),
-#                                     DescTools::MixColor('red', 'white', amount1 = 0.1),
-#                                     DescTools::MixColor('red', 'white', amount1 = 0.5),"red"), space="Lab")(nHalf)
-#   rampcols = c(rc1,"#FEFEFE","#FEFEFE", rc2)
-#
-#   ## In your example, this line sets the color for values between 49 and 51.
-#   #rampcols[c(nHalf, nHalf+1)] = rgb(t(col2rgb("white")), maxColorValue=256)
-#
-#   rb1 = seq(Min, Thresh, length.out=nHalf+2)
-#   rb2 = seq(Thresh, Max, length.out=nHalf+1)[-1]
-#  #
-#   rampbreaks = c(rb1, rb2)
-#
-#   #dd = data.frame(cols=rampcols,breaks = rampbreaks)
-#
-#
-#  # r.range = c(Min, Max)
+
+
+  paste(path,"/meanVarPlot_",1,"_",name1, ".png",sep="")
 
 
 
 
-#
-#   mypal <- colorRampPalette(c("blue",
-#                               DescTools:: MixColor('blue', 'white', amount1 = 0.8),
-#                               DescTools:: MixColor('blue', 'white', amount1 = 0.5),
-#                               DescTools::MixColor('blue', 'white', amount1 = 0.2),
-#                               "white",'white',
-#                               DescTools::MixColor('red', 'white', amount1 = 0.2),
-#                               DescTools::MixColor('red', 'white', amount1 = 0.5),
-#                               DescTools::MixColor('red', 'white', amount1 = 0.8),
-#                               "red"),
-#                             bias=1)
 
 
-  #plot(ConnectMatrix4,digits=1, breaks=rampbreaks, col = rampcols )
+   png(  paste(path,"/meanVarPlot_",name1, ".png",sep="")
+         , width = 10, height = 6, units = "in", res = 600)
 
-   png(  paste(path,"/MatrixPlot_",name2,"_",name1, ".png",sep="")
-         , width = 12, height = 8, units = "in", res = 600)
+   par(mfrow=c(1,2));par(oma=c(3,3,3,3)) # all sides have 3 lines of space
+   par(mar=c(5,4,4,2) + 0.1)
+   cuts=seq(from=0,to=35, by=5) #set breaks
 
-  par(mar=c(5.1, 5.1, 4.1, 0))   # adapt margins
-
-  try( plot(ConnectMatrix4,key=list(cex=0),digits=1, breaks=rampbreaks,  col = rampcols, main=paste(name2," - ", name1, sep=""),
-       ylab="Spawning Areas", xlab="Settlement Areas"),silent=T )
+   plot(ConnectMatrixMean, breaks=cuts, col=viridis(length(cuts)),ylab="", xlab="",main="")
+   plot(ConnectMatrixVAR, col=plasma(length(cuts)),ylab="",xlab="",main="")
 
  dev.off()
 
