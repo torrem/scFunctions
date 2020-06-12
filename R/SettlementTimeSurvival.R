@@ -13,14 +13,14 @@
 #'
 
 
-group=Fixed_Hindcast[25:34]
+
 
 
 
 
 SetSurv <-function(group){
 
-  TTS = data.frame(timeSet = vector())
+  TTS = vector()
   Surv = data.frame(SP = rep(NA, length(group)))
 
    for (kk in 1:length(group)){
@@ -41,16 +41,19 @@ SetSurv <-function(group){
     settlers = settlers[order(settlers$origID)[!duplicated(sort(settlers$origID))],] ## makes sure only unique settlers are used
 
     Surv[kk,1] = (nrow(settlers)/nrow(starters))*100
-
+    TTS = c(TTS,settlers$age)
 
 
 
    }
 
 
+  mSurv = mean(Surv$SP)
+  sdSurv = sd(Surv$SP)
 
+  mTTS = mean(TTS)
+  sdTTS = sd(TTS)
 
-
-
+  print(paste( 'MS = ', mSurv, ';    SDS = ', sdSurv, ';    MTTS = ',   mTTS, ';    sdTTS = ',   sdTTS , sep=""))
 
 }
